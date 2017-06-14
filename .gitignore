@@ -1,0 +1,6 @@
+Release
+/
+Debug/
+__vm/
+.vs/
+Settings.h
