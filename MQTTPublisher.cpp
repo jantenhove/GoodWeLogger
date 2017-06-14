@@ -105,7 +105,7 @@ void MQTTPublisher::handle()
 		{
 			if (inverters[0].addressConfirmed)
 			{
-				auto prependTopic = String("goodwe/") + String(inverters[cnt].serialNumber);
+				auto prependTopic = (String("goodwe/") + String(inverters[cnt].serialNumber)).c_str();
 				if (debugMode)
 				{
 					Serial.print("Publishing prepend topic for this inverter is: ");
@@ -124,7 +124,7 @@ void MQTTPublisher::handle()
 						client.publish((prependTopic + String("/ipv2")).c_str(), String(inverters[cnt].ipv2, 1).c_str());
 						client.publish((prependTopic + String("/vac1")).c_str(), String(inverters[cnt].vac1, 1).c_str());
 						client.publish((prependTopic + String("/iac1")).c_str(), String(inverters[cnt].iac1, 1).c_str());
-						client.publish((prependTopic + String("/fac1")).c_str(), String(inverters[cnt].iac1, 2).c_str());
+						client.publish((prependTopic + String("/fac1")).c_str(), String(inverters[cnt].fac1, 2).c_str());
 						client.publish((prependTopic + String("/pac")).c_str(), String(inverters[cnt].pac).c_str());
 						client.publish((prependTopic + String("/temp")).c_str(), String(inverters[cnt].temp, 1).c_str());
 						client.publish((prependTopic + String("/eday")).c_str(), String(inverters[cnt].eDay).c_str());
@@ -146,7 +146,7 @@ void MQTTPublisher::handle()
 						//TODO: Rest of data 
 					}
 				}
-				else
+				else if(sendRegular) //only send offline info on regular basis
 					client.publish((prependTopic + String("/online")).c_str(), String(0).c_str());
 			}
 
