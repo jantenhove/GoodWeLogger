@@ -88,16 +88,16 @@ void PVOutputPublisher::sendToPvOutput(GoodWeCommunicator::GoodweInverterInforma
 	//v12 = custom 6 = errormsg
 	postMsg += String("&v12=") + String(info.errorMessage);
 
-	//int httpCode = http.POST(postMsg); //Send the request
-	//String payload = http.getString();  //Get the response payload
-	//http.end();
+	int httpCode = http.POST(postMsg); //Send the request
+	String payload = http.getString();  //Get the response payload
+	http.end();
 	if (debugMode)
 	{
 		Serial.println(postMsg);
-	//	Serial.print("Result: ");
-	//	Serial.println(httpCode);
-	//	Serial.print("Payload: ");
-	//	Serial.println(payload);
+		Serial.print("Result: ");
+		Serial.println(httpCode);
+		Serial.print("Payload: ");
+		Serial.println(payload);
 	}
 
 }
