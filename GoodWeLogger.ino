@@ -20,7 +20,7 @@ MQTTPublisher mqqtPublisher(&settingsManager, &goodweComms, true);
 PVOutputPublisher pvoutputPublisher(&settingsManager, &goodweComms, true);
 WiFiUDP ntpUDP;
 
-NTPClient timeClient(ntpUDP, "eu.pool.ntp.org");
+NTPClient timeClient(ntpUDP, "pool.ntp.org");
 bool validTimeSet =false;
 
 void setup()
@@ -91,7 +91,6 @@ void setup()
 	mqqtPublisher.start();
 	validTimeSet = timeClient.update();
 	timeClient.setTimeOffset(settings->timezone * 60 * 60);
-	timeClient.setUpdateInterval(5);
 
 }
 

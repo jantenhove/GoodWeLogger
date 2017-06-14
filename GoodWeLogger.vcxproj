@@ -87,6 +87,7 @@
     <ClInclude Include="GoodWeCommunicator.h" />
     <ClInclude Include="MQTTPublisher.h" />
     <ClInclude Include="PVOutputPublisher.h" />
+    <ClInclude Include="Settings.h" />
     <ClInclude Include="SettingsManager.h" />
     <ClInclude Include="__vm\.GoodWeLogger.vsarduino.h" />
   </ItemGroup>
