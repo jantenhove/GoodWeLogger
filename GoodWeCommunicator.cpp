@@ -100,7 +100,11 @@ void GoodWeCommunicator::checkOfflineInverters()
 {
 	//check inverter timeout
 	for (char index = 0; index < inverters.size(); ++index)
+	{
 		inverters[index].isOnline = (millis() - inverters[index].lastSeen < OFFLINE_TIMEOUT);
+		sendRemoveRegistration(inverters[index].address); //send in case the inverter thinks we are online
+	}
+		
 }
 
 void GoodWeCommunicator::checkIncomingData()
@@ -201,6 +205,8 @@ void GoodWeCommunicator::parseIncomingData(char incomingDataLength) //
 	if (debugMode)
 		Serial.println("CRC match.");
 
+
+
 	//check the contorl code and function code to see what to do
 	if (inputBuffer[2] == 0x00 && inputBuffer[3] == 0x80)
 		handleRegistration(inputBuffer + 5, 16);
@@ -253,7 +259,7 @@ void GoodWeCommunicator::handleRegistrationConfirmation(char address)
 	if (debugMode)
 	{
 		Serial.print("Handling registration information for address: ");
-		Serial.println(address);
+		Serial.println((short)address);
 	}
 	//lookup the inverter and set it to confirmed
 	auto inverter = getInverterInfoByAddress(address);
@@ -345,7 +351,7 @@ void GoodWeCommunicator::sendAllocateRegisterAddress(char * serialNumber, char a
 	if (debugMode)
 	{
 		Serial.print("SendAllocateRegisterAddress address: ");
-		Serial.println(address);
+		Serial.println((short)address);
 	}
 
 	//create our registrationpacket with serialnumber and address and send it over
@@ -382,6 +388,7 @@ void GoodWeCommunicator::handle()
 		askAllInvertersForInformation();
 		lastInfoUpdateSent = millis();
 	}
+	checkIncomingData();
 
 }
 
