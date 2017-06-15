@@ -2,6 +2,7 @@
 #include <vector>
 #include <SoftwareSerial.h>
 #include <ESP8266WiFi.h>
+#include "SettingsManager.h"
 
 #define GOODWE_COMMS_ADDRES 0xAB
 #define PACKET_TIMEOUT 500			//0.5 sec packet timeout
@@ -54,7 +55,7 @@ public:
 		float eDay = 0.0;
 	};
 
-	GoodWeCommunicator(int receivePin, int transmitPin, bool debugMode = false);
+	GoodWeCommunicator(SettingsManager * settingsManager, bool debugMode = false);
 	void start();
 	void stop();
 	void handle();

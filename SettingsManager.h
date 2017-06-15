@@ -15,15 +15,19 @@ public:
 		int mqttQuickUpdateInterval;
 		int mqttRegularUpdateInterval;
 
-
-		int timezone;
-
+		//pvoutput settings
 		String pvoutputApiKey;
 		String pvoutputSystemId;
 		int pvoutputUpdateInterval;
 
+		//wifi settings
 		String wifiSSID;
 		String wifiPassword;
+
+		//general settings
+		int RS485Rx =D1;		//default set because added later
+		int RS485Tx =D2;
+		int timezone;
 
 	};
 	SettingsManager();

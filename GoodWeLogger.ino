@@ -14,8 +14,8 @@
 #include "Settings.h"			//change and then rename Settings.example.h to Settings.h to compile
 
 
-GoodWeCommunicator goodweComms(D1, D2, true);
 SettingsManager settingsManager;
+GoodWeCommunicator goodweComms(&settingsManager, true);
 MQTTPublisher mqqtPublisher(&settingsManager, &goodweComms, true);
 PVOutputPublisher pvoutputPublisher(&settingsManager, &goodweComms, true);
 WiFiUDP ntpUDP;
@@ -40,6 +40,9 @@ void setup()
 	settings->wifiSSID = WIFI_SSID;
 	settings->wifiPassword = WIFI_PASSWORD;
 	settings->timezone = TIMEZONE;
+	settings->RS485Rx = RS485_RX;
+	settings->RS485Tx = RS485_TX;
+
 
 	/* add setup code here */
 	Serial.begin(115200);

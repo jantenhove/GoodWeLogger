@@ -34,3 +34,8 @@
 //timezone offset in hours (amsterdam is +2 in summertime). Used for posting to pvoutput
 #define TIMEZONE 2
 
+//rs485 receive pin
+#define RS485_RX D1
+
+//rs485 transmit pin
+#define RS485_TX D2
