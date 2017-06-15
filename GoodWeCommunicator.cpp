@@ -28,7 +28,7 @@ void GoodWeCommunicator::start()
 	}
 
 
-	Serial.println("GoodWe Comminucator started.");
+	Serial.println("GoodWe Communicator started.");
 }
 
 void GoodWeCommunicator::stop()
