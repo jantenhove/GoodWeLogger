@@ -37,6 +37,7 @@ pin 2 | B-
 They cannot work simulataneously.**
 
 Connect the RS485 converter to your ESP8266 like this:
+
 RS485 converter | ESP8266
 --- | ---
 GND | G / GND
