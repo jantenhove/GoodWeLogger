@@ -27,10 +27,12 @@ The RS485 connector on the inverter is located under a screw plate at the bottom
 ***Above information applies to the GWxxxD-NS inverters. Other models might use a different method of connection. Consult your inverter manual.***
 
 Connect the RS485 converter to your inverter like this:
+
 Inverter | RS485 converter
 --- | ---
 pin 1 | A+
 pin 2 | B-
+
 **Pay attention, RS485 will only work if you disconnect the WiFi-module at the bottom of the inverter and restart the inverter. 
 They cannot work simulataneously.**
 
