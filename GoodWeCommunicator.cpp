@@ -100,8 +100,14 @@ void GoodWeCommunicator::checkOfflineInverters()
 	//check inverter timeout
 	for (char index = 0; index < inverters.size(); ++index)
 	{
-		inverters[index].isOnline = (millis() - inverters[index].lastSeen < OFFLINE_TIMEOUT);
-		sendRemoveRegistration(inverters[index].address); //send in case the inverter thinks we are online
+		if (inverters[index].isOnline)
+		{
+			inverters[index].isOnline = (millis() - inverters[index].lastSeen < OFFLINE_TIMEOUT);
+			//check if inverter timed out
+			if(!inverters[index].isOnline)
+				sendRemoveRegistration(inverters[index].address); //send in case the inverter thinks we are online
+		}
+		
 	}
 		
 }
