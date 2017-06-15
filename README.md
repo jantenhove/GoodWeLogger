@@ -1,16 +1,16 @@
 ﻿# GoodWe Solar inverter logger based on ESP8266
 
-This ESP8266 firmware enables you to read information from a GoodWe solar inverter through it's RS485-bus.
-Sending information to a MQTT-broker is supported, as well as uploading information to [PVoutput](https://pvoutput.org/).
+This ESP8266 firmware enables you to read information from a GoodWe solar inverter through it's RS485 bus.
+Sending information to a MQTT broker is supported, as well as uploading information to [PVoutput](https://pvoutput.org/).
 
 ## Requirements
-  - GoodWe inverter with RS485 connector (this software has been tested with GW3600D-NS and GW3000-NS, but others might also work)
+  - GoodWe inverter with RS485 connector (this software has been tested with GW3600D-NS and GW3000-NS inverter, but others might also work)
   - RS485 converter (can be found on sites like AliExpress, search for *SCM TTL to RS485 Adapter 485 to UART Serial Port 3.3V 5V Level Converter Module*)  
   - ESP8266 (like NodeMCU or Wemos D1 mini)
   - Computer with Arduino IDE installed
 
 ## Flashing firmware
- - To flash this firmware, you need to setup the Arduino IDE and configure it for the board you are using (NodeMCU / Wemos)
+ - To flash this firmware, you will need to install the Arduino IDE and configure it for the board you are using (NodeMCU / Wemos)
  - You will also need the following libraries
    - ['Time' library](https://github.com/PaulStoffregen/Time)
    - [NTPClient](https://github.com/arduino-libraries/NTPClient)
@@ -22,19 +22,26 @@ Sending information to a MQTT-broker is supported, as well as uploading informat
  - Diagnostics information is sent over serial at 115200 baud *(wifi status, MQTT status, inverter connection status)*
 
 ## Connecting hardware
-The RS485 connector on the inverter is located under a screw plate at the bottom of the inverter (next to the WiFi-module). It is a 6-pin green screw terminal (female) you can order the male counterpart on Ebay/AliExpress/Farnell. You might also use Dupont wires that you insert directly in the female connector. The first pin is the pin at the backside of the inverter.
+The RS485 connector on the inverter is located at the bottom of the inverter, visible when you remove the WiFi module. It can also be hidden behind a small metal plate (for inverters without WiFi). It is a 6 pin green screw terminal (female) you can order the male counterpart on eBay/AliExpress/Farnell. Using female DuPont wires that you insert directly into the connector might also work.
 
-***Above information applies to the GWxxxD-NS range of inverters. Other models might use a different method of connecting. Consult your inverter manual.***
+***Above information applies to the GWxxxxD-NS range of inverters. Other models might use a different method of connecting. Consult your inverter manual.***
 
-Connect the RS485 converter to your inverter like this:
+The connector inside the inverter looks like this:
+
+    +--+--+--+--+--+--+    +------------+
+    |  |  |  |  |  |  |    |------------|   
+    +--+--+--+--+--+--+    +------------+     
+     1  2  3  4  5  6           USB           
+
+Connection scheme:
 
 Inverter | RS485 converter
 --- | ---
-pin 1 | A+
-pin 2 | B-
+pin 1  (485_TX-) | A+
+pin 2 (485_TX+) | B-
 
-**Pay attention, RS485 will only work if you disconnect the WiFi-module at the bottom of the inverter and restart the inverter. 
-They cannot work simulataneously.**
+**Pay attention, RS485 will only work if you disconnect the WiFi module and restart the inverter. 
+They cannot work simultaneously.**
 
 Connect the RS485 converter to your ESP8266 like this:
 
@@ -45,7 +52,7 @@ RXD | D1
 TXD | D2
 VCC | 5V / 3V3
 
-*(The `D1` and `D2` can be configured to different pins in `Settings.h`)*.
+*(`D1` (receive) and `D2` (transmit) can be configured to different pins in `Settings.h`)*. It might look weird to connect `RXD` of the module to the receive pin of the ESP8266, but this is how the RS485 converter is labeled.
 
 ## MQTT
 Subscribe to the `goodwe/` topic in your MQTT client. Information will be posted there and will look like this:
@@ -79,13 +86,13 @@ workmode | Undocumented parameter. Default=1 | binary
 online | Inverter status (1=on, 0=off) | binary
 
 ## PVoutput
-When you have your API key and System ID configured correctly in `Settings.h`, production data from the inverter will be uploaded to PVoutput every 5 minutes *(interval is configurable in `Settings.h`, but don't go lower than the minimal interval of every 5 minutes as specified by PVoutput)*.
+When you have your PVoutput *API key* and *System ID* configured correctly in `Settings.h`, production data from the inverter will be uploaded to PVoutput every 5 minutes *(interval is configurable in `Settings.h`, but don't go lower than the minimal interval of every 5 minutes as specified by PVoutput)*.
 When multiple inverters are connected, by daisy-chaining the RS485 cable, only the production data of the first inverter will be uploaded.
 
-For the PVoutput upload function to work, it is important that the ESP8266  has access to the internet. 
+For the PVoutput upload function to work, it is important that the ESP8266 has access to the internet. 
 Apart from connections being made to PVoutput, you will also see that the ESP8266 talks with pool.ntp.org on a regular interval. This is done to retrieve the current time, which is needed to post data to PVoutput.
 
-If you only plan to use MQTT, internet access for the ESP8266 is not needed.
+If you plan to use only MQTT, internet access for the ESP8266 is not needed.
 
 
 ## TODO
