@@ -105,7 +105,7 @@ void MQTTPublisher::handle()
 		{
 			if (inverters[0].addressConfirmed)
 			{
-				auto prependTopic = (String("goodwe/") + String(inverters[cnt].serialNumber)).c_str();
+				auto prependTopic = (String("goodwe/") + String(inverters[cnt].serialNumber));
 				if (debugMode)
 				{
 					Serial.print("Publishing prepend topic for this inverter is: ");
@@ -117,37 +117,37 @@ void MQTTPublisher::handle()
 					if (sendQuick)
 					{
 						//send out fast changing values
-						client.publish((prependTopic + String("/online")).c_str(), String(1).c_str());
-						client.publish((prependTopic + String("/vpv1")).c_str(), String(inverters[cnt].vpv1, 1).c_str());
-						client.publish((prependTopic + String("/vpv2")).c_str(), String(inverters[cnt].vpv2, 1).c_str());
-						client.publish((prependTopic + String("/ipv1")).c_str(), String(inverters[cnt].ipv1, 1).c_str());
-						client.publish((prependTopic + String("/ipv2")).c_str(), String(inverters[cnt].ipv2, 1).c_str());
-						client.publish((prependTopic + String("/vac1")).c_str(), String(inverters[cnt].vac1, 1).c_str());
-						client.publish((prependTopic + String("/iac1")).c_str(), String(inverters[cnt].iac1, 1).c_str());
-						client.publish((prependTopic + String("/fac1")).c_str(), String(inverters[cnt].fac1, 2).c_str());
-						client.publish((prependTopic + String("/pac")).c_str(), String(inverters[cnt].pac).c_str());
-						client.publish((prependTopic + String("/temp")).c_str(), String(inverters[cnt].temp, 1).c_str());
-						client.publish((prependTopic + String("/eday")).c_str(), String(inverters[cnt].eDay).c_str());
+						client.publish((prependTopic.c_str() + String("/online")).c_str(), String(1).c_str());
+						client.publish((prependTopic.c_str() + String("/vpv1")).c_str(), String(inverters[cnt].vpv1, 1).c_str());
+						client.publish((prependTopic.c_str() + String("/vpv2")).c_str(), String(inverters[cnt].vpv2, 1).c_str());
+						client.publish((prependTopic.c_str() + String("/ipv1")).c_str(), String(inverters[cnt].ipv1, 1).c_str());
+						client.publish((prependTopic.c_str() + String("/ipv2")).c_str(), String(inverters[cnt].ipv2, 1).c_str());
+						client.publish((prependTopic.c_str() + String("/vac1")).c_str(), String(inverters[cnt].vac1, 1).c_str());
+						client.publish((prependTopic.c_str() + String("/iac1")).c_str(), String(inverters[cnt].iac1, 1).c_str());
+						client.publish((prependTopic.c_str() + String("/fac1")).c_str(), String(inverters[cnt].fac1, 2).c_str());
+						client.publish((prependTopic.c_str() + String("/pac")).c_str(), String(inverters[cnt].pac).c_str());
+						client.publish((prependTopic.c_str() + String("/temp")).c_str(), String(inverters[cnt].temp, 1).c_str());
+						client.publish((prependTopic.c_str() + String("/eday")).c_str(), String(inverters[cnt].eDay).c_str());
 						if (inverters[cnt].isDTSeries)
 						{
 							//also send tri fase info
-							client.publish((prependTopic + String("/vac2")).c_str(), String(inverters[cnt].vac2, 1).c_str());
-							client.publish((prependTopic + String("/iac2")).c_str(), String(inverters[cnt].iac2, 1).c_str());
-							client.publish((prependTopic + String("/fac2")).c_str(), String(inverters[cnt].iac2, 2).c_str());
-							client.publish((prependTopic + String("/vac3")).c_str(), String(inverters[cnt].vac3, 1).c_str());
-							client.publish((prependTopic + String("/iac3")).c_str(), String(inverters[cnt].iac3, 1).c_str());
-							client.publish((prependTopic + String("/fac3")).c_str(), String(inverters[cnt].iac3, 2).c_str());
+							client.publish((prependTopic.c_str() + String("/vac2")).c_str(), String(inverters[cnt].vac2, 1).c_str());
+							client.publish((prependTopic.c_str() + String("/iac2")).c_str(), String(inverters[cnt].iac2, 1).c_str());
+							client.publish((prependTopic.c_str() + String("/fac2")).c_str(), String(inverters[cnt].iac2, 2).c_str());
+							client.publish((prependTopic.c_str() + String("/vac3")).c_str(), String(inverters[cnt].vac3, 1).c_str());
+							client.publish((prependTopic.c_str() + String("/iac3")).c_str(), String(inverters[cnt].iac3, 1).c_str());
+							client.publish((prependTopic.c_str() + String("/fac3")).c_str(), String(inverters[cnt].iac3, 2).c_str());
 						}
 					}
 					else
 					{
 						//regular
-						client.publish((prependTopic + String("/workmode")).c_str(), String(inverters[cnt].workMode).c_str());
+						client.publish((prependTopic.c_str() + String("/workmode")).c_str(), String(inverters[cnt].workMode).c_str());
 						//TODO: Rest of data 
 					}
 				}
 				else if(sendRegular) //only send offline info on regular basis
-					client.publish((prependTopic + String("/online")).c_str(), String(0).c_str());
+					client.publish((prependTopic.c_str() + String("/online")).c_str(), String(0).c_str());
 			}
 
 		}
