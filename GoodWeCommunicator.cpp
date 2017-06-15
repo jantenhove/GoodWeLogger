@@ -23,7 +23,6 @@ void GoodWeCommunicator::start()
 	for (char cnt = 1; cnt < 255; cnt++)
 	{
 		sendRemoveRegistration(cnt);
-		yield();
 		delay(1);
 	}
 
