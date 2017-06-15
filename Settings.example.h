@@ -8,7 +8,7 @@
 #define MQTT_HOST_NAME  "192.168.2.2"
 
 //mqtt port for the above host
-#define MQTT_PORT       8092
+#define MQTT_PORT       1883
 
 //if authentication is enabled for mqtt, set the username below. Leave empty to disable authentication
 #define MQTT_USER_NAME  "<mqtt user name>"
