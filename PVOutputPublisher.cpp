@@ -59,13 +59,17 @@ void PVOutputPublisher::sendToPvOutput(GoodWeCommunicator::GoodweInverterInforma
 	postMsg += String("&v1=") + String(info.eDay *1000,0); //TODO: improve resolution by adding avg power to prev val
 
 	//v2 = Power Generation
-	postMsg += String("&v2=") + String(avgCounter ? currentPacSum / avgCounter : 0); //improve resolution by adding avg power to prev val
+	if (avgCounter) //no datapoints recorded
+	{
+		postMsg += String("&v2=") + String(currentPacSum / avgCounter); //improve resolution by adding avg power to prev val
 
-	//v3 and v4 are power consumption (maybe doable using mqtt?)
-	//v5 = temp
-	postMsg += String("&v5=") + String(avgCounter ? currentTempSum / avgCounter : 0,2); 
-	//v6 = voltage
-	postMsg += String("&v6=") + String(avgCounter ? currentVoltageSum / avgCounter : 0,2); 
+																						 //v3 and v4 are power consumption (maybe doable using mqtt?)
+																						 //v5 = temp
+		postMsg += String("&v5=") + String(currentTempSum / avgCounter, 2);
+		//v6 = voltage
+		postMsg += String("&v6=") + String(currentVoltageSum / avgCounter, 2);
+	}
+	
 
 	 //v7 = custom 1 = vac1
 	postMsg += String("&v7=") + String(info.vac1,2); 
