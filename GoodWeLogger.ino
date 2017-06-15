@@ -113,8 +113,8 @@ void loop()
 	ArduinoOTA.handle();
 	goodweComms.handle();
 	mqqtPublisher.handle();
-	//start the pvoutput publisher after the time has been set
-	if (validTimeSet && !pvoutputPublisher.getIsStarted())
+	//start the pvoutput publisher after the time has been set if it is configured to start
+	if (validTimeSet && pvoutputPublisher.canStart() && !pvoutputPublisher.getIsStarted())
 	{
 		pvoutputPublisher.start();
 	}

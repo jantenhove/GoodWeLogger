@@ -13,6 +13,7 @@ public:
 
 	void start();
 	void stop();
+	bool canStart();
 	bool getIsStarted();
 	void sendToPvOutput(GoodWeCommunicator::GoodweInverterInformation info);
 
@@ -23,9 +24,17 @@ private:
 	SettingsManager * pvOutputSettingsManager;
 	GoodWeCommunicator * goodweCommunicator;
 	bool debugMode;
-
 	unsigned long lastUpdated;
-	bool isStarted = false;
+	bool isStarted = false;	 
+	unsigned long currentPacSum = 0;
+	unsigned int lastPac = 0;
+	float lastVoltage = 0;
+	double currentVoltageSum = 0;
+	float lastTemp;
+	double currentTemp = 0;
+	double currentTempSum = 0;
+	unsigned long avgCounter = 0;
+	bool wasOnline = false;
 
 	String getZeroFilled(int num);
 };

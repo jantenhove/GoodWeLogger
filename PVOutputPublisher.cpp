@@ -1,6 +1,7 @@
 #include "PVOutputPublisher.h"
 
 
+HTTPClient http; //our web client to perform post with
 
 PVOutputPublisher::PVOutputPublisher(SettingsManager * settingsManager, GoodWeCommunicator * goodWe, bool inDebugMode)
 {
@@ -16,8 +17,7 @@ PVOutputPublisher::~PVOutputPublisher()
 
 void PVOutputPublisher::start()
 {
-	pvoutputSettings = pvOutputSettingsManager->GetSettings();
-	if (pvoutputSettings->pvoutputApiKey.length() == 0)
+	if (!canStart())
 	{
 		Serial.println("PVOutput is disabled.");
 		return;
@@ -33,24 +33,16 @@ void PVOutputPublisher::stop()
 	isStarted = false;
 }
 
+bool PVOutputPublisher::canStart()
+{
+	pvoutputSettings = pvOutputSettingsManager->GetSettings();
+	return (pvoutputSettings->pvoutputApiKey.length() > 0);
+}
+
 bool PVOutputPublisher::getIsStarted()
 {
 	return isStarted;
 }
-
-unsigned long lastUpdated = 0;
-unsigned long currentPacSum = 0;
-unsigned int lastPac=0;
-float lastVoltage = 0;
-double currentVoltageSum = 0;
-float lastTemp;
-double currentTemp = 0;
-double currentTempSum = 0;
-
-unsigned long avgCounter = 0;
-bool wasOnline = false;
-
-HTTPClient http; //our web client to perform post with
 
 void PVOutputPublisher::sendToPvOutput(GoodWeCommunicator::GoodweInverterInformation info)
 {
