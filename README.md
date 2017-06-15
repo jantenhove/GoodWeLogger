@@ -24,7 +24,7 @@ Sending information to a MQTT-broker is supported, as well as uploading informat
 ## Connecting hardware
 The RS485 connector on the inverter is located under a screw plate at the bottom of the inverter (next to the WiFi-module). It is a 6-pin green screw terminal (female) you can order the male counterpart on Ebay/AliExpress/Farnell. You might also use Dupont wires that you insert directly in the female connector. The first pin is the pin at the backside of the inverter.
 
-***Above information applies to the GWxxxD-NS inverters. Other models might use a different method of connection. Consult your inverter manual.***
+***Above information applies to the GWxxxD-NS range of inverters. Other models might use a different method of connecting. Consult your inverter manual.***
 
 Connect the RS485 converter to your inverter like this:
 
