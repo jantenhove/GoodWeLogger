@@ -74,6 +74,7 @@ int GoodWeCommunicator::sendData(char address, char controlCode, char functionCo
 	goodweSerial->write(low);
 	if (debugMode)
 	{
+		Serial.print("CRC high/low: ");
 		debugPrintHex(high);
 		debugPrintHex(low);
 		Serial.println(".");
@@ -92,7 +93,8 @@ void GoodWeCommunicator::debugPrintHex(char bt)
 void GoodWeCommunicator::sendDiscovery()
 {
 	//send out discovery for unregistered devices.
-	Serial.println("Sending discovery");
+	if(debugMode)
+		Serial.println("Sending discovery");
 	sendData(0x7F, 0x00, 0x00, 0x00, nullptr);
 }
 
@@ -103,10 +105,22 @@ void GoodWeCommunicator::checkOfflineInverters()
 	{
 		if (inverters[index].isOnline)
 		{
-			inverters[index].isOnline = (millis() - inverters[index].lastSeen < OFFLINE_TIMEOUT);
+			auto newOnline = (millis() - inverters[index].lastSeen < OFFLINE_TIMEOUT);
+			
 			//check if inverter timed out
-			if(!inverters[index].isOnline)
+			if (!newOnline && inverters[index].isOnline)
+			{
+				if (debugMode)
+				{
+					Serial.print("Marking inverter @ address: ");
+					Serial.print((short)inverters[index].address);
+					Serial.println("offline.");
+				}
+
 				sendRemoveRegistration(inverters[index].address); //send in case the inverter thinks we are online
+			}
+			inverters[index].isOnline = newOnline;
+				
 		}
 		
 	}
@@ -235,6 +249,8 @@ void GoodWeCommunicator::handleRegistration(char * serialNumber, char length)
 		//check inverter 
 		if (memcmp(inverters[index].serialNumber, serialNumber, 16) == 0)
 		{
+			Serial.print("Already registered inverter reregistered with address: ");
+			Serial.println((short)inverters[index].address);
 			//found it. Set to unconfirmed and send out the existing address to the inverter
 			inverters[index].addressConfirmed = false;
 			inverters[index].lastSeen = millis();
@@ -272,6 +288,7 @@ void GoodWeCommunicator::handleRegistrationConfirmation(char address)
 	if (inverter)
 	{
 		inverter->addressConfirmed = true;
+		inverter->isOnline = true;
 		inverter->lastSeen = millis();
 	}
 	//get the information straight away
