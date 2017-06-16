@@ -28,10 +28,10 @@ The RS485 connector on the inverter is located at the bottom of the inverter, vi
 
 The connector inside the inverter looks like this:
 
-    +--+--+--+--+--+--+    +------------+
-    |  |  |  |  |  |  |    |------------|   
-    +--+--+--+--+--+--+    +------------+     
-     1  2  3  4  5  6           USB           
+       +------------+    +--+--+--+--+--+--+
+       |------------|    |  |  |  |  |  |  |   
+       +------------+    +--+--+--+--+--+--+ 
+           USB              1  2  3  4  5  6
 
 Connection scheme:
 
