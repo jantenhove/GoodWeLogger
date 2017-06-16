@@ -68,6 +68,7 @@ private:
 
 	static const int BufferSize = 96;	// largest packet is 67 bytes long. Extra for receiving with sliding window 
 	SoftwareSerial * goodweSerial;
+	SettingsManager * settingsManager;
 
 	char headerBuffer[7];
 	char inputBuffer[BufferSize];

@@ -1,16 +1,17 @@
 #include "GoodWeCommunicator.h"
 
 
-GoodWeCommunicator::GoodWeCommunicator(SettingsManager * settingsManager, bool inDebug)
+GoodWeCommunicator::GoodWeCommunicator(SettingsManager * settingsMan, bool inDebug)
 {
-	auto settings = settingsManager->GetSettings();
-	//create the software serial on the custom pins so we can use the hardware serial for debug comms.
-	goodweSerial = new SoftwareSerial(settings->RS485Rx, settings->RS485Tx, false, BufferSize); // (RX, TX. inverted, buffer)
+	settingsManager = settingsMan;
 	debugMode = inDebug;
 }
 
 void GoodWeCommunicator::start()
 {
+	auto settings = settingsManager->GetSettings();
+	//create the software serial on the custom pins so we can use the hardware serial for debug comms.
+	goodweSerial = new SoftwareSerial(settings->RS485Rx, settings->RS485Tx, false, BufferSize); // (RX, TX. inverted, buffer)
 	//start the software serial
 	goodweSerial->begin(9600); //inverter fixed baud rate
 
