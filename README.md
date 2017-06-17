@@ -31,7 +31,7 @@ The connector inside the inverter looks like this:
        +------------+    +--+--+--+--+--+--+
        |------------|    |  |  |  |  |  |  |   
        +------------+    +--+--+--+--+--+--+ 
-           USB              1  2  3  4  5  6
+           USB            1  2  3  4  5  6
 
 Connection scheme:
 
