@@ -15,7 +15,7 @@ class GoodWeCommunicator
 public:
 	struct GoodweInverterInformation
 	{
-		char serialNumber[17];		//serial number (ascii) from inverter
+		char serialNumber[17];		//serial number (ascii) from inverter with zero appended
 		char address;				//address provided by this software
 		bool addressConfirmed;		//wether or not the address is confirmed by te inverter
 		unsigned long lastSeen;		//when was the inverter last seen? If not seen for 30 seconds the inverter is marked offline. 

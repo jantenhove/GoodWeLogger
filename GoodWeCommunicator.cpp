@@ -274,6 +274,12 @@ void GoodWeCommunicator::handleRegistration(char * serialNumber, char length)
 		lastUsedAddress++;
 	newInverter.address = lastUsedAddress;
 	inverters.push_back(newInverter);
+	if (debugMode)
+	{
+		Serial.print("New inverter found. Current # registrations: ");
+		Serial.println(inverters.size());
+	}
+
 	sendAllocateRegisterAddress(serialNumber, lastUsedAddress);
 }
 
@@ -288,9 +294,21 @@ void GoodWeCommunicator::handleRegistrationConfirmation(char address)
 	auto inverter = getInverterInfoByAddress(address);
 	if (inverter)
 	{
+		if (debugMode)
+			Serial.println("Inverter information found in list of inverters.");
 		inverter->addressConfirmed = true;
 		inverter->isOnline = true;
 		inverter->lastSeen = millis();
+	}
+	else
+	{
+		if (debugMode)
+		{
+			Serial.print("Error. Could not find the inverter with address: ");
+			Serial.println((short)address);
+			Serial.print("Current # registrations: ");
+			Serial.println(inverters.size());
+		}
 	}
 	//get the information straight away
 	askInverterForInformation(address);
@@ -348,6 +366,19 @@ void GoodWeCommunicator::askAllInvertersForInformation()
 	{
 		if (inverters[index].addressConfirmed && inverters[index].isOnline)
 			askInverterForInformation(inverters[index].address);
+		else
+		{
+			if (debugMode)
+			{
+				Serial.print("Not asking inverter with address: ");
+				Serial.print((short)inverters[index].address);
+				Serial.print(" for information. Addressconfirmed: ");
+				Serial.print((short)inverters[index].addressConfirmed);
+				Serial.print(", isOnline: ");
+				Serial.print((short)inverters[index].isOnline);
+				Serial.println(".");
+			}
+		}
 	}
 
 }
