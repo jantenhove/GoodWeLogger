@@ -1,4 +1,5 @@
 #pragma once
+#define MQTT_SOCKET_TIMEOUT 5
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include "SettingsManager.h"
@@ -8,6 +9,7 @@
 #include "WiFiClient.h"
 
 #define RECONNECT_TIMEOUT 5000
+
 
 class MQTTPublisher
 {
