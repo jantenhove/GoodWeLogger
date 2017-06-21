@@ -52,25 +52,35 @@ void PVOutputPublisher::sendToPvOutput(GoodWeCommunicator::GoodweInverterInforma
 	http.addHeader("X-Pvoutput-Apikey", pvoutputSettings->pvoutputApiKey ); 
 	http.addHeader("X-Pvoutput-SystemId", pvoutputSettings->pvoutputSystemId ); 
 	http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+	//the inverter only reports eday with a .1 kWh resolution. This messus up the avg in pvoutput because the max resolution is 1200 Wh
+	//we now the avg power in the last period so we can calc the new eday and compare it
+	float eDay = info.eDay * 1000;
+	if (avgCounter)
+	{
+		float avgWhPower = (float)(currentPacSum / avgCounter) / (60.0 * 60 * 1000 / (float)(millis() - lastUpdated));
+		if (eDay - MAX_EDAY_DIFF  < prevEday + avgWhPower)
+			eDay = prevEday + avgWhPower;
+	}
+	prevEday = eDay;
 	//construct our post message
 	String postMsg = String("d=") + String(year()) + getZeroFilled(month()) + getZeroFilled(day());
 	postMsg += String("&t=") + getZeroFilled(hour()) + ":" + getZeroFilled(minute());
 	//v1 = total wh today
-	postMsg += String("&v1=") + String(info.eDay *1000,0); //TODO: improve resolution by adding avg power to prev val
+	postMsg += String("&v1=") + String(eDay,0); //TODO: improve resolution by adding avg power to prev val
 
 	//v2 = Power Generation
 	if (avgCounter) //no datapoints recorded
 	{
 		postMsg += String("&v2=") + String(currentPacSum / avgCounter); //improve resolution by adding avg power to prev val
 
-																						 //v3 and v4 are power consumption (maybe doable using mqtt?)
-																						 //v5 = temp
+		//v3 and v4 are power consumption (maybe doable using mqtt?)
+		//v5 = temp
 		postMsg += String("&v5=") + String(currentTempSum / avgCounter, 2);
 		//v6 = voltage
 		postMsg += String("&v6=") + String(currentVoltageSum / avgCounter, 2);
 	}
 	
-
 	 //v7 = custom 1 = vac1
 	postMsg += String("&v7=") + String(info.vac1,2); 
 	//v8 = custom 2 = iac1
@@ -95,7 +105,6 @@ void PVOutputPublisher::sendToPvOutput(GoodWeCommunicator::GoodweInverterInforma
 		Serial.print("Payload: ");
 		Serial.println(payload);
 	}
-
 }
 
 String PVOutputPublisher::getZeroFilled(int num)
@@ -137,7 +146,7 @@ void PVOutputPublisher::handle()
 		{
 			//keep track of when the inverter went offline
 			if (!wasOnline && inverters[0].isOnline)
-				wasOnline = inverters[0].isOnline;
+				wasOnline = true;
 
 			//check if inverter info was updated
 			if (inverters[0].isOnline && ( inverters[0].pac != lastPac || inverters[0].vpv1 + inverters[0].vpv2 != lastVoltage || inverters[0].temp != lastTemp))

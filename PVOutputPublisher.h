@@ -5,6 +5,9 @@
 #include "SettingsManager.h"
 #include "GoodWeCommunicator.h"
 #include "ESP8266HTTPClient.h"
+
+#define MAX_EDAY_DIFF 100.0f
+
 class PVOutputPublisher
 {
 public:
@@ -35,7 +38,7 @@ private:
 	double currentTempSum = 0;
 	unsigned long avgCounter = 0;
 	bool wasOnline = false;
-
+	float prevEday = 0.0f;
 	String getZeroFilled(int num);
 };
 
