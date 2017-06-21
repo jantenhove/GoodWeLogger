@@ -151,7 +151,6 @@ void MQTTPublisher::handle()
 				else if(sendRegular) //only send offline info on regular basis
 					if (sendOk) sendOk = client.publish((prependTopic.c_str() + String("/online")).c_str(), String(0).c_str());
 			}
-
 		}
 
 		if (sendQuick)
@@ -165,7 +164,4 @@ void MQTTPublisher::handle()
 			Serial.println(sendOk);
 		}
 	}
-
-
-
 }

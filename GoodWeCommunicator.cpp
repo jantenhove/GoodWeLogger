@@ -28,7 +28,6 @@ void GoodWeCommunicator::start()
 		delay(1);
 	}
 
-
 	Serial.println("GoodWe Communicator started.");
 }
 
@@ -120,12 +119,9 @@ void GoodWeCommunicator::checkOfflineInverters()
 
 				sendRemoveRegistration(inverters[index].address); //send in case the inverter thinks we are online
 			}
-			inverters[index].isOnline = newOnline;
-				
-		}
-		
-	}
-		
+			inverters[index].isOnline = newOnline;				
+		}		
+	}		
 }
 
 void GoodWeCommunicator::checkIncomingData()
@@ -174,7 +170,6 @@ void GoodWeCommunicator::checkIncomingData()
 			}
 			else if (!startPacketReceived)
 				lastReceivedByte = incomingData; //keep track of the last incoming byte so we detect the packet start
-
 		}
 
 		lastReceived = millis();
@@ -225,9 +220,7 @@ void GoodWeCommunicator::parseIncomingData(char incomingDataLength) //
 		return;
 	if (debugMode)
 		Serial.println("CRC match.");
-
-
-
+	
 	//check the contorl code and function code to see what to do
 	if (inputBuffer[2] == 0x00 && inputBuffer[3] == 0x80)
 		handleRegistration(inputBuffer + 5, 16);
@@ -235,7 +228,6 @@ void GoodWeCommunicator::parseIncomingData(char incomingDataLength) //
 		handleRegistrationConfirmation(inputBuffer[0]);
 	if (inputBuffer[2] == 0x01 && inputBuffer[3] == 0x81)
 		handleIncomingInformation(inputBuffer[0], inputBuffer[4], inputBuffer + 5);
-
 }
 
 void GoodWeCommunicator::handleRegistration(char * serialNumber, char length)
@@ -258,7 +250,6 @@ void GoodWeCommunicator::handleRegistration(char * serialNumber, char length)
 			sendAllocateRegisterAddress(serialNumber, inverters[index].address);
 			return;
 		}
-
 	}
 
 	//still here. This a new inverter
@@ -357,7 +348,6 @@ float GoodWeCommunicator::bytesToFloat(char * bt, char factor)
 {
 	//convert two byte to float by converting to short and then dividing it by factor
 	return float(((short)bt[0] << 8) | bt[1]) / factor;
-
 }
 
 void GoodWeCommunicator::askAllInvertersForInformation()
@@ -380,15 +370,12 @@ void GoodWeCommunicator::askAllInvertersForInformation()
 			}
 		}
 	}
-
 }
 
 void GoodWeCommunicator::askInverterForInformation(char address)
 {
 	sendData(address, 0x01, 0x01, 0, nullptr);
 }
-
-
 
 GoodWeCommunicator::GoodweInverterInformation *  GoodWeCommunicator::getInverterInfoByAddress(char address)
 {
@@ -444,7 +431,6 @@ void GoodWeCommunicator::handle()
 		lastInfoUpdateSent = millis();
 	}
 	checkIncomingData();
-
 }
 
 

@@ -45,7 +45,7 @@ void setup()
 	settings->RS485Tx = RS485_TX;
 
 
-	/* add setup code here */
+	//Init our compononents
 	Serial.begin(115200);
 	Serial.println("Booting");
 	WiFi.mode(WIFI_STA);
@@ -61,8 +61,6 @@ void setup()
 
 	timeClient.begin();
 
-
-	// Hostname defaults to esp8266-[ChipID]
 	ArduinoOTA.setHostname("GoodWeLogger");
 
 	ArduinoOTA.onStart([]() {
@@ -87,15 +85,11 @@ void setup()
 	Serial.println("IP address: ");
 	Serial.println(WiFi.localIP());
 
-
-	
-
 	//ntp client
 	goodweComms.start();
 	mqqtPublisher.start();
 	validTimeSet = timeClient.update();
 	timeClient.setTimeOffset(settings->timezone * 60 * 60);
-
 }
 
 
@@ -119,10 +113,8 @@ void loop()
 	mqqtPublisher.handle();
 	//start the pvoutput publisher after the time has been set if it is configured to start
 	if (validTimeSet && pvoutputPublisher.canStart() && !pvoutputPublisher.getIsStarted())
-	{
 		pvoutputPublisher.start();
-	}
 
 	pvoutputPublisher.handle();
-	delay(0);
+	delay(0); //prevent wathcdog timeout
 }
