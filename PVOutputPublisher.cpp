@@ -47,10 +47,10 @@ bool PVOutputPublisher::getIsStarted()
 void PVOutputPublisher::sendToPvOutput(GoodWeCommunicator::GoodweInverterInformation info)
 {
 	//need to send out the data to pvouptut> use the avg values for pac, voltage and temp
-	
+
 	http.begin("http://pvoutput.org/service/r2/addstatus.jsp"); //Specify request destination
-	http.addHeader("X-Pvoutput-Apikey", pvoutputSettings->pvoutputApiKey ); 
-	http.addHeader("X-Pvoutput-SystemId", pvoutputSettings->pvoutputSystemId ); 
+	http.addHeader("X-Pvoutput-Apikey", pvoutputSettings->pvoutputApiKey);
+	http.addHeader("X-Pvoutput-SystemId", pvoutputSettings->pvoutputSystemId);
 	http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
 	//the inverter only reports eday with a .1 kWh resolution. This messus up the avg in pvoutput because the max resolution is 1200 Wh
@@ -59,7 +59,7 @@ void PVOutputPublisher::sendToPvOutput(GoodWeCommunicator::GoodweInverterInforma
 	if (avgCounter)
 	{
 		float avgWhPower = (float)(currentPacSum / avgCounter) / (60.0 * 60 * 1000 / (float)(millis() - lastUpdated));
-		if (eDay - MAX_EDAY_DIFF  < prevEday + avgWhPower)
+		if (eDay - MAX_EDAY_DIFF < prevEday + avgWhPower && abs(prevEday + avgWhPower - eDay) < MAX_EDAY_DIFF) //when a new day starts the 'abs' part will reset to zero
 			eDay = prevEday + avgWhPower;
 	}
 	prevEday = eDay;
@@ -67,7 +67,7 @@ void PVOutputPublisher::sendToPvOutput(GoodWeCommunicator::GoodweInverterInforma
 	String postMsg = String("d=") + String(year()) + getZeroFilled(month()) + getZeroFilled(day());
 	postMsg += String("&t=") + getZeroFilled(hour()) + ":" + getZeroFilled(minute());
 	//v1 = total wh today
-	postMsg += String("&v1=") + String(eDay,0); //TODO: improve resolution by adding avg power to prev val
+	postMsg += String("&v1=") + String(eDay, 0); //TODO: improve resolution by adding avg power to prev val
 
 	//v2 = Power Generation
 	if (avgCounter) //no datapoints recorded
@@ -80,13 +80,13 @@ void PVOutputPublisher::sendToPvOutput(GoodWeCommunicator::GoodweInverterInforma
 		//v6 = voltage
 		postMsg += String("&v6=") + String(currentVoltageSum / avgCounter, 2);
 	}
-	
-	 //v7 = custom 1 = vac1
-	postMsg += String("&v7=") + String(info.vac1,2); 
+
+	//v7 = custom 1 = vac1
+	postMsg += String("&v7=") + String(info.vac1, 2);
 	//v8 = custom 2 = iac1
-	postMsg += String("&v8=") + String(info.iac1, 2); 
+	postMsg += String("&v8=") + String(info.iac1, 2);
 	//v9 = custom 3 = fac1
-	postMsg += String("&v9=") + String(info.fac1, 2); 
+	postMsg += String("&v9=") + String(info.fac1, 2);
 	//v10 = custom 4 = vpv1
 	postMsg += String("&v10=") + String(info.vpv1, 2);
 	//v11 = custom 5 = vpv2
@@ -121,7 +121,7 @@ void PVOutputPublisher::handle()
 	auto inverters = goodweCommunicator->getInvertersInfo();
 	if (inverters.size() > 0)
 	{
-		
+
 		//check if we need to send the info to pvoutptut.
 		//if not check if the pac value changed add it to the current sum so we can calc the average on sending
 		if (wasOnline && millis() - lastUpdated > pvoutputSettings->pvoutputUpdateInterval)
@@ -149,12 +149,12 @@ void PVOutputPublisher::handle()
 				wasOnline = true;
 
 			//check if inverter info was updated
-			if (inverters[0].isOnline && ( inverters[0].pac != lastPac || inverters[0].vpv1 + inverters[0].vpv2 != lastVoltage || inverters[0].temp != lastTemp))
+			if (inverters[0].isOnline && (inverters[0].pac != lastPac || inverters[0].vpv1 + inverters[0].vpv2 != lastVoltage || inverters[0].temp != lastTemp))
 			{
 				//changed. so change the avg counters
 				lastPac = inverters[0].pac;
 				lastVoltage = inverters[0].vpv1 + inverters[0].vpv2;
-				lastTemp= inverters[0].temp;
+				lastTemp = inverters[0].temp;
 				currentPacSum += lastPac;
 				currentVoltageSum += lastVoltage;
 				currentTempSum += lastTemp;
