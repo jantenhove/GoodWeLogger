@@ -22,6 +22,8 @@ public:
 
 	void handle();
 
+	void ResetAverage();
+
 private:
 	SettingsManager::Settings * pvoutputSettings;
 	SettingsManager * pvOutputSettingsManager;

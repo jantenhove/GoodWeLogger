@@ -24,6 +24,7 @@ private:
 	unsigned long lastSentQuickUpdate = 0;			//last update of the fast changing info
 	unsigned long lastSentRegularUpdate = 0;		//last update of the regular update info
 
+	bool publishOnMQTT(String prepend, String topic, String value);
 	bool reconnect();
 public:
 	MQTTPublisher(SettingsManager * settingsManager, GoodWeCommunicator *goodWe, bool inDebugMode = false);
@@ -31,6 +32,7 @@ public:
 
 	void start();
 	void stop();
+	
 	void handle();
 };
 

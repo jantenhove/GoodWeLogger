@@ -109,12 +109,15 @@ void loop()
 	}
 
 	ArduinoOTA.handle();
+	yield();
 	goodweComms.handle();
+	yield();
 	mqqtPublisher.handle();
+	yield();
 	//start the pvoutput publisher after the time has been set if it is configured to start
 	if (validTimeSet && pvoutputPublisher.canStart() && !pvoutputPublisher.getIsStarted())
 		pvoutputPublisher.start();
 
 	pvoutputPublisher.handle();
-	delay(0); //prevent wathcdog timeout
+	yield(); //prevent wathcdog timeout
 }
