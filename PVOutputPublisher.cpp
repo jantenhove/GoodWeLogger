@@ -128,11 +128,7 @@ void PVOutputPublisher::handle()
 		{
 			//send it out
 			sendToPvOutput(inverters[0]);
-			//reset counter vals
-			avgCounter = 0;
-			currentPacSum = 0;
-			currentVoltageSum = 0;
-			currentTempSum = 0;
+			ResetAverage();
 			//send the current values to pvoutput
 			lastUpdated = millis();
 
@@ -146,8 +142,12 @@ void PVOutputPublisher::handle()
 		{
 			//keep track of when the inverter went offline
 			if (!wasOnline && inverters[0].isOnline)
+			{
 				wasOnline = true;
-
+				//cleaar all avg data first
+				ResetAverage();
+			}
+			
 			//check if inverter info was updated
 			if (inverters[0].isOnline && (inverters[0].pac != lastPac || inverters[0].vpv1 + inverters[0].vpv2 != lastVoltage || inverters[0].temp != lastTemp))
 			{
@@ -162,4 +162,13 @@ void PVOutputPublisher::handle()
 			}
 		}
 	}
+}
+
+void PVOutputPublisher::ResetAverage()
+{
+	//reset counter vals
+	avgCounter = 0;
+	currentPacSum = 0;
+	currentVoltageSum = 0;
+	currentTempSum = 0;
 }
