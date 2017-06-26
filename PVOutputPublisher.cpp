@@ -72,6 +72,12 @@ void PVOutputPublisher::sendToPvOutput(GoodWeCommunicator::GoodweInverterInforma
 	//v2 = Power Generation
 	if (avgCounter) //no datapoints recorded
 	{
+		if (debugMode)
+		{
+			Serial.print("Got some readings to calculate the avg power, temp and voltage. # readings: ");
+			Serial.println(avgCounter);
+		}
+
 		postMsg += String("&v2=") + String(currentPacSum / avgCounter); //improve resolution by adding avg power to prev val
 
 		//v3 and v4 are power consumption (maybe doable using mqtt?)
@@ -129,13 +135,14 @@ void PVOutputPublisher::handle()
 			//send it out
 			sendToPvOutput(inverters[0]);
 			ResetAverage();
-			//send the current values to pvoutput
 			lastUpdated = millis();
 
 			if (!inverters[0].isOnline && wasOnline)
 			{
 				//went offline. Data was sent for the last time
 				wasOnline = false;
+				//cleaar all avg data first
+				ResetAverage();
 			}
 		}
 		else
