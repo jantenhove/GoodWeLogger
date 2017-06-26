@@ -95,6 +95,7 @@ void MQTTPublisher::handle()
 	}
 	//got a valid mqtt connection. Loop through the inverts and send out the data if needed
 	client.loop();
+
 	bool sendRegular = millis() - lastSentRegularUpdate > mqttSettings->mqttRegularUpdateInterval;
 	bool sendQuick = millis() - lastSentQuickUpdate > mqttSettings->mqttQuickUpdateInterval;
 
@@ -123,6 +124,9 @@ void MQTTPublisher::handle()
 						if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vpv2", String(inverters[cnt].vpv2, 1));
 						if (sendOk) sendOk = publishOnMQTT(prependTopic, "/ipv1", String(inverters[cnt].ipv1, 1));
 						if (sendOk) sendOk = publishOnMQTT(prependTopic, "/ipv2", String(inverters[cnt].ipv2, 1));
+						//publishing sometimes cuases the wdt to reset the ESP. 
+						//On the github page of the pubsubclient it was suggested to add extra client.loop().
+						client.loop();
 						if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vac1", String(inverters[cnt].vac1, 1));
 						if (sendOk) sendOk = publishOnMQTT(prependTopic, "/iac1", String(inverters[cnt].iac1, 1));
 						if (sendOk) sendOk = publishOnMQTT(prependTopic, "/fac1", String(inverters[cnt].fac1, 2));
@@ -131,6 +135,8 @@ void MQTTPublisher::handle()
 
 						if (inverters[cnt].isDTSeries)
 						{
+							//On the github page of the pubsubclient it was suggested to add extra client.loop().
+							client.loop();
 							//also send tri fase info
 							if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vac2", String(inverters[cnt].vac2, 1));
 							if (sendOk) sendOk = publishOnMQTT(prependTopic, "/iac2", String(inverters[cnt].iac2, 1));
@@ -151,6 +157,9 @@ void MQTTPublisher::handle()
 				else if (sendRegular) //only send offline info on regular basis
 					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/online", "0");
 			}
+
+			//On the github page of the pubsubclient it was suggested to add extra client.loop().
+			client.loop();
 		}
 
 		if (sendQuick)
