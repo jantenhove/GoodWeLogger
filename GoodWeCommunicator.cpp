@@ -288,7 +288,7 @@ void GoodWeCommunicator::handleRegistrationConfirmation(char address)
 		if (debugMode)
 			Serial.println("Inverter information found in list of inverters.");
 		inverter->addressConfirmed = true;
-		inverter->isOnline = true;
+		inverter->isOnline = false; //inverter is online, but we first need to get its information
 		inverter->lastSeen = millis();
 	}
 	else
@@ -337,17 +337,19 @@ void GoodWeCommunicator::handleIncomingInformation(char address, char dataLength
 		inverter->fac2 = bytesToFloat(data + dtPtr, 100);		dtPtr += 2;
 		inverter->fac3 = bytesToFloat(data + dtPtr, 100);		dtPtr += 2;
 	}
-	inverter->pac = ((short)(data[dtPtr]) << 8) | (data[dtPtr +1]);			dtPtr += 2;
-	inverter->workMode = ((short)(data[dtPtr]) << 8) | (data[dtPtr + 1]);	dtPtr += 2;
+	inverter->pac = ((unsigned short)(data[dtPtr]) << 8) | (data[dtPtr +1]);			dtPtr += 2;
+	inverter->workMode = ((unsigned short)(data[dtPtr]) << 8) | (data[dtPtr + 1]);	dtPtr += 2;
 	//TODO: Get the other values too
 	inverter->temp = bytesToFloat(data + dtPtr, 10);		dtPtr += inverter->isDTSeries ? 34 : 26;
 	inverter->eDay = bytesToFloat(data + dtPtr, 10);		
+	//isonline is set after first batch of data is set so readers get actual data 
+	inverter->isOnline = true;
 }
 
 float GoodWeCommunicator::bytesToFloat(char * bt, char factor)
 {
 	//convert two byte to float by converting to short and then dividing it by factor
-	return float(((short)bt[0] << 8) | bt[1]) / factor;
+	return float(((unsigned short)bt[0] << 8) | bt[1]) / factor;
 }
 
 void GoodWeCommunicator::askAllInvertersForInformation()

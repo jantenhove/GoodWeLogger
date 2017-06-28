@@ -75,7 +75,9 @@ void PVOutputPublisher::sendToPvOutput(GoodWeCommunicator::GoodweInverterInforma
 		if (debugMode)
 		{
 			Serial.print("Got some readings to calculate the avg power, temp and voltage. # readings: ");
-			Serial.println(avgCounter);
+			Serial.print(avgCounter);
+			Serial.print(", pac sum: ");
+			Serial.println(currentPacSum);
 		}
 
 		postMsg += String("&v2=") + String(currentPacSum / avgCounter); //improve resolution by adding avg power to prev val
@@ -178,4 +180,7 @@ void PVOutputPublisher::ResetAverage()
 	currentPacSum = 0;
 	currentVoltageSum = 0;
 	currentTempSum = 0;
+	lastPac = 0;
+	lastVoltage = 0;
+	lastTemp = 0;
 }
