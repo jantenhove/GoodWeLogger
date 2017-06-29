@@ -1,14 +1,14 @@
-#pragma once
 #define MQTT_SOCKET_TIMEOUT 5
+#pragma once
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include "SettingsManager.h"
 #include "GoodWeCommunicator.h"
 #include <vector>
-#include <PubSubClient.h>
+#include "PubSubClient.h"
 #include "WiFiClient.h"
 
-#define RECONNECT_TIMEOUT 5000
+#define RECONNECT_TIMEOUT 15000
 
 
 class MQTTPublisher
