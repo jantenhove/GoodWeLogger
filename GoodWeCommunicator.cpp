@@ -224,9 +224,9 @@ void GoodWeCommunicator::parseIncomingData(char incomingDataLength) //
 	//check the contorl code and function code to see what to do
 	if (inputBuffer[2] == 0x00 && inputBuffer[3] == 0x80)
 		handleRegistration(inputBuffer + 5, 16);
-	if (inputBuffer[2] == 0x00 && inputBuffer[3] == 0x81)
+	else if (inputBuffer[2] == 0x00 && inputBuffer[3] == 0x81)
 		handleRegistrationConfirmation(inputBuffer[0]);
-	if (inputBuffer[2] == 0x01 && inputBuffer[3] == 0x81)
+	else if (inputBuffer[2] == 0x01 && inputBuffer[3] == 0x81)
 		handleIncomingInformation(inputBuffer[0], inputBuffer[4], inputBuffer + 5);
 }
 
@@ -305,12 +305,15 @@ void GoodWeCommunicator::handleRegistrationConfirmation(char address)
 	askInverterForInformation(address);
 }
 
-void GoodWeCommunicator::handleIncomingInformation(char address, char dataLengthh, char * data)
+void GoodWeCommunicator::handleIncomingInformation(char address, char dataLength, char * data)
 {
 	//need to parse the information and update our struct
 	//parse all pairs of two bytes and output them
 	auto inverter = getInverterInfoByAddress(address);
 	if (inverter == nullptr) return;
+
+	if (dataLength < 44) //minimum for non dt series
+		return;
 
 	//data from iniverter, means online
 	inverter->lastSeen = millis();
