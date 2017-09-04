@@ -105,7 +105,7 @@ void MQTTPublisher::handle()
 		auto inverters = goodweCommunicator->getInvertersInfo();
 		for (char cnt = 0; cnt < inverters.size(); cnt++)
 		{
-			if (inverters[0].addressConfirmed)
+			if (inverters[cnt].addressConfirmed)
 			{
 				auto prependTopic = (String("goodwe/") + String(inverters[cnt].serialNumber));
 				if (debugMode)
