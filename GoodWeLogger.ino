@@ -38,6 +38,7 @@ void setup()
 	settings->pvoutputApiKey = PVOUTPUT_API_KEY;	
 	settings->pvoutputSystemId = PVOUTPUT_SYSTEM_ID;	
 	settings->pvoutputUpdateInterval = PVOUTPUT_UPDATE_INTERVAL;	
+	settings->wifiHostname = WIFI_HOSTNAME;
 	settings->wifiSSID = WIFI_SSID;
 	settings->wifiPassword = WIFI_PASSWORD;
 	settings->timezone = TIMEZONE;
@@ -49,6 +50,7 @@ void setup()
 	Serial.begin(115200);
 	Serial.println("Booting");
 	WiFi.mode(WIFI_STA);
+	WiFi.hostname(settings->wifiHostname.c_str());
 	WiFi.begin(settings->wifiSSID.c_str(), settings->wifiPassword.c_str());
 
 	Serial.print("Connecting to WiFi");
