@@ -21,6 +21,7 @@ public:
 		int pvoutputUpdateInterval;
 
 		//wifi settings
+		String wifiHostname;		//Set hostname for ESP8266
 		String wifiSSID;
 		String wifiPassword;
 
