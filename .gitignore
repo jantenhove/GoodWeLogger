@@ -5,3 +5,5 @@ __vm/
 .vs/
 Settings.h
 /startMqttDebug.bat
+/SoftwareSerialOriginal.cpp
+/SoftwareSerialOriginal.h
