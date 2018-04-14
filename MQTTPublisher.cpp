@@ -140,10 +140,10 @@ void MQTTPublisher::handle()
 							//also send tri fase info
 							if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vac2", String(inverters[cnt].vac2, 1));
 							if (sendOk) sendOk = publishOnMQTT(prependTopic, "/iac2", String(inverters[cnt].iac2, 1));
-							if (sendOk) sendOk = publishOnMQTT(prependTopic, "/fac2", String(inverters[cnt].iac2, 2));
+							if (sendOk) sendOk = publishOnMQTT(prependTopic, "/fac2", String(inverters[cnt].fac2, 2));
 							if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vac3", String(inverters[cnt].vac3, 1));
 							if (sendOk) sendOk = publishOnMQTT(prependTopic, "/iac3", String(inverters[cnt].iac3, 1));
-							if (sendOk) sendOk = publishOnMQTT(prependTopic, "/fac3", String(inverters[cnt].iac3, 2));
+							if (sendOk) sendOk = publishOnMQTT(prependTopic, "/fac3", String(inverters[cnt].fac3, 2));
 						}
 					}
 					else
