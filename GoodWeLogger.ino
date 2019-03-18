@@ -11,11 +11,13 @@
 #include "SettingsManager.h"
 #include "MQTTPublisher.h"
 #include "PVOutputPublisher.h"
+#include "WifiConnector.h"
 #include "ESP8266mDNS.h"
 #include "Settings.h"			//change and then rename Settings.example.h to Settings.h to compile
 
 
 SettingsManager settingsManager;
+WifiConnector wifiConnector(&settingsManager, true);
 GoodWeCommunicator goodweComms(&settingsManager, true);
 MQTTPublisher mqqtPublisher(&settingsManager, &goodweComms, true);
 PVOutputPublisher pvoutputPublisher(&settingsManager, &goodweComms, true);
@@ -49,17 +51,9 @@ void setup()
 	//Init our compononents
 	Serial.begin(115200);
 	Serial.println("Booting");
-	WiFi.mode(WIFI_STA);
-	WiFi.hostname(settings->wifiHostname.c_str());
-	WiFi.begin(settings->wifiSSID.c_str(), settings->wifiPassword.c_str());
 
-	Serial.print("Connecting to WiFi");
-	while (WiFi.status() != WL_CONNECTED) {
-		delay(500);
-		Serial.print(".");
-	}
-	Serial.println("");
-	Serial.println("Connected!");
+	// Start Wifi
+	wifiConnector.start();
 
 	timeClient.begin();
 
@@ -83,9 +77,6 @@ void setup()
 		else if (error == OTA_END_ERROR) Serial.println("End Failed");
 	});
 	ArduinoOTA.begin();
-	Serial.println("Ready");
-	Serial.println("IP address: ");
-	Serial.println(WiFi.localIP());
 
 	//ntp client
 	goodweComms.start();
@@ -110,6 +101,8 @@ void loop()
 		setTime(timeClient.getEpochTime());
 	}
 
+	wifiConnector.handle();
+	yield();
 	ArduinoOTA.handle();
 	yield();
 	goodweComms.handle();
@@ -122,4 +115,5 @@ void loop()
 
 	pvoutputPublisher.handle();
 	yield(); //prevent wathcdog timeout
+
 }
