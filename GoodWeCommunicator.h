@@ -5,7 +5,7 @@
 #include "SettingsManager.h"
 
 #define GOODWE_COMMS_ADDRES 0xAB
-#define PACKET_TIMEOUT 500			//0.5 sec packet timeout
+#define PACKET_TIMEOUT 5000			//5 sec packet timeout
 #define OFFLINE_TIMEOUT 30000		//30 seconds no data -> inverter offline
 #define DISCOVERY_INTERVAL 10000	//10 secs between discovery 
 #define INFO_INTERVAL 1000			//get inverter info every second

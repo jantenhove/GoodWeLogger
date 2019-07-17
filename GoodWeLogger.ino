@@ -1,5 +1,3 @@
-
-
 #include <TimeLib.h>
 #include <NTPClient.h>
 #include <ESP8266WiFi.h>
@@ -11,18 +9,17 @@
 #include "SettingsManager.h"
 #include "MQTTPublisher.h"
 #include "PVOutputPublisher.h"
-#include "ESP8266mDNS.h"
 #include "Settings.h"			//change and then rename Settings.example.h to Settings.h to compile
 
 
 SettingsManager settingsManager;
-GoodWeCommunicator goodweComms(&settingsManager, true);
-MQTTPublisher mqqtPublisher(&settingsManager, &goodweComms, true);
-PVOutputPublisher pvoutputPublisher(&settingsManager, &goodweComms, true);
+GoodWeCommunicator goodweComms(&settingsManager, false);
+MQTTPublisher mqqtPublisher(&settingsManager, &goodweComms, false);
+PVOutputPublisher pvoutputPublisher(&settingsManager, &goodweComms, false);
 WiFiUDP ntpUDP;
-
 NTPClient timeClient(ntpUDP, "pool.ntp.org");
 bool validTimeSet =false;
+int reconnectCounter = 0;
 
 void setup()
 {
@@ -62,7 +59,7 @@ void setup()
 	Serial.println("Connected!");
 
 	timeClient.begin();
-
+	
 	ArduinoOTA.setHostname("GoodWeLogger");
 
 	ArduinoOTA.onStart([]() {
@@ -94,6 +91,30 @@ void setup()
 	timeClient.setTimeOffset(settings->timezone * 60 * 60);
 }
 
+bool checkConnectToWifi()
+{
+	//check for wifi connection
+	while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0, 0, 0, 0))
+	{
+		Serial.println("Connecting to WIFI...");
+		reconnectCounter++;
+		if (reconnectCounter > 60)
+			return false;
+		auto settings = settingsManager.GetSettings();
+		WiFi.disconnect();
+		WiFi.begin(settings->wifiSSID.c_str(), settings->wifiPassword.c_str());
+		delay(2000);
+
+		if (WiFi.status() == WL_CONNECTED)
+		{
+			Serial.println("Connected to the WiFi network");
+			reconnectCounter = 0;
+		}
+		else
+			delay(5000);//further delay 
+	}
+	return true;
+}
 
 void loop()
 {
@@ -109,6 +130,10 @@ void loop()
 		//sync time to time lib
 		setTime(timeClient.getEpochTime());
 	}
+
+	//check wifi connection
+	if (!checkConnectToWifi())
+		ESP.restart();
 
 	ArduinoOTA.handle();
 	yield();

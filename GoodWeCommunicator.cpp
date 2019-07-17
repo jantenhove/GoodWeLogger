@@ -138,6 +138,7 @@ void GoodWeCommunicator::checkIncomingData()
 			{
 				//packet start received
 				startPacketReceived = true;
+				lastReceived = millis();
 				curReceivePtr = 0;
 				numToRead = 0;
 				lastReceivedByte = 0x00; //reset last received for next packet
@@ -172,9 +173,9 @@ void GoodWeCommunicator::checkIncomingData()
 				lastReceivedByte = incomingData; //keep track of the last incoming byte so we detect the packet start
 		}
 
-		lastReceived = millis();
+		
 	}
-	else if (startPacketReceived && millis() - lastReceived > PACKET_TIMEOUT) // 0.5 sec timoeut
+	if (startPacketReceived && millis() - lastReceived > PACKET_TIMEOUT) // 0.5 sec timoeut
 	{
 		//there is an open packet timeout. 
 		startPacketReceived = false; //wait for start packet again

@@ -93,6 +93,7 @@ void MQTTPublisher::handle()
 	if (!client.connected() && millis() - lastConnectionAttempt > RECONNECT_TIMEOUT) {
 		if (!reconnect()) return;
 	}
+
 	//got a valid mqtt connection. Loop through the inverts and send out the data if needed
 	client.loop();
 
