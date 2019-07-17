@@ -1,6 +1,3 @@
-//Hostname of ESP8266
-#define WIFI_HOSTNAME "GoodWeLogger"
-
 //Wifi SSID to connect to
 #define WIFI_SSID "<your wifi ssid>"
 
