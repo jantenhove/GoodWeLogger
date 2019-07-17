@@ -39,3 +39,9 @@
 
 //rs485 transmit pin
 #define RS485_TX D2
+
+//Hostname to use on local network
+#define WIFI_HOSTNAME "GoodWeLogger"
+
+//NTP server addres
+#define NTP_SERVER "pool.ntp.org"

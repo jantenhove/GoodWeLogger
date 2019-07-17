@@ -17,7 +17,7 @@ GoodWeCommunicator goodweComms(&settingsManager, false);
 MQTTPublisher mqqtPublisher(&settingsManager, &goodweComms, false);
 PVOutputPublisher pvoutputPublisher(&settingsManager, &goodweComms, false);
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "pool.ntp.org");
+NTPClient timeClient(ntpUDP, NTP_SERVER);
 bool validTimeSet =false;
 int reconnectCounter = 0;
 
@@ -58,6 +58,7 @@ void setup()
 	Serial.println("");
 	Serial.println("Connected!");
 
+	timeClient.setUpdateInterval(1000 * 60 * 60); //one hour updates
 	timeClient.begin();
 	
 	ArduinoOTA.setHostname("GoodWeLogger");

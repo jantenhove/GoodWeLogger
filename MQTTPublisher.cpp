@@ -156,7 +156,7 @@ void MQTTPublisher::handle()
 					}
 				}
 				else if (sendRegular) //only send offline info on regular basis
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/online", "0");
+					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/online", "0");					
 			}
 
 			//On the github page of the pubsubclient it was suggested to add extra client.loop().
