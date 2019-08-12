@@ -18,7 +18,7 @@ MQTTPublisher mqqtPublisher(&settingsManager, &goodweComms, false);
 PVOutputPublisher pvoutputPublisher(&settingsManager, &goodweComms, false);
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, NTP_SERVER);
-bool validTimeSet =false;
+bool validTimeSet = false;
 int reconnectCounter = 0;
 
 void setup()
@@ -26,15 +26,15 @@ void setup()
 	//debug settings
 	auto settings = settingsManager.GetSettings();
 	//set settings from heade file
-	settings->mqttHostName = MQTT_HOST_NAME;	
-	settings->mqttPort = MQTT_PORT;	
+	settings->mqttHostName = MQTT_HOST_NAME;
+	settings->mqttPort = MQTT_PORT;
 	settings->mqttUserName = MQTT_USER_NAME;
-	settings->mqttPassword = MQTT_PASSWORD;	
-	settings->mqttQuickUpdateInterval = MQTT_QUICK_UPDATE_INTERVAL;	
-	settings->mqttRegularUpdateInterval = MQTT_REGULAR_UPDATE_INTERVAL;	
-	settings->pvoutputApiKey = PVOUTPUT_API_KEY;	
-	settings->pvoutputSystemId = PVOUTPUT_SYSTEM_ID;	
-	settings->pvoutputUpdateInterval = PVOUTPUT_UPDATE_INTERVAL;	
+	settings->mqttPassword = MQTT_PASSWORD;
+	settings->mqttQuickUpdateInterval = MQTT_QUICK_UPDATE_INTERVAL;
+	settings->mqttRegularUpdateInterval = MQTT_REGULAR_UPDATE_INTERVAL;
+	settings->pvoutputApiKey = PVOUTPUT_API_KEY;
+	settings->pvoutputSystemId = PVOUTPUT_SYSTEM_ID;
+	settings->pvoutputUpdateInterval = PVOUTPUT_UPDATE_INTERVAL;
 	settings->wifiHostname = WIFI_HOSTNAME;
 	settings->wifiSSID = WIFI_SSID;
 	settings->wifiPassword = WIFI_PASSWORD;
@@ -49,18 +49,17 @@ void setup()
 	WiFi.mode(WIFI_STA);
 	WiFi.hostname(settings->wifiHostname.c_str());
 	WiFi.begin(settings->wifiSSID.c_str(), settings->wifiPassword.c_str());
-
-	Serial.print("Connecting to WiFi");
-	while (WiFi.status() != WL_CONNECTED) {
-		delay(500);
-		Serial.print(".");
+	
+	//check wifi connection
+	if (!checkConnectToWifi())
+	{
+		Serial.println("Cannot establish WiFi connection Please check the Wifi settings in the header file. Restarting ESP");
+		ESP.restart();
 	}
-	Serial.println("");
-	Serial.println("Connected!");
 
 	timeClient.setUpdateInterval(1000 * 60 * 60); //one hour updates
 	timeClient.begin();
-	
+
 	ArduinoOTA.setHostname("GoodWeLogger");
 
 	ArduinoOTA.onStart([]() {
@@ -95,24 +94,22 @@ void setup()
 bool checkConnectToWifi()
 {
 	//check for wifi connection
-	while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0, 0, 0, 0))
+	if (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0, 0, 0, 0))
 	{
 		Serial.println("Connecting to WIFI...");
-		reconnectCounter++;
-		if (reconnectCounter > 60)
-			return false;
-		auto settings = settingsManager.GetSettings();
-		WiFi.disconnect();
-		WiFi.begin(settings->wifiSSID.c_str(), settings->wifiPassword.c_str());
-		delay(2000);
-
-		if (WiFi.status() == WL_CONNECTED)
-		{
-			Serial.println("Connected to the WiFi network");
-			reconnectCounter = 0;
+		int totalWaitTime = 0;
+		while (WiFi.status() != WL_CONNECTED)
+		{ // Wait for the Wi-Fi to connect
+			delay(1000);
+			totalWaitTime += 1000;
+			Serial.print(".");
+			if (totalWaitTime > WIFI_CONNECT_TIMEOUT)
+			{
+				//no connection.
+				Serial.println("\nWiFi connect timed out");
+				return false;
+			}
 		}
-		else
-			delay(5000);//further delay 
 	}
 	return true;
 }
@@ -127,14 +124,18 @@ void loop()
 	{
 		if (!validTimeSet)
 			validTimeSet = true; //pvoutput is started after the time is set
-	
+
 		//sync time to time lib
 		setTime(timeClient.getEpochTime());
 	}
 
 	//check wifi connection
 	if (!checkConnectToWifi())
+	{
+		Serial.println("Wifi connection lost for too long. Restarting ESP");
 		ESP.restart();
+	}
+		
 
 	ArduinoOTA.handle();
 	yield();

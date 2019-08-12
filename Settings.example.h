@@ -45,3 +45,6 @@
 
 //NTP server addres
 #define NTP_SERVER "pool.ntp.org"
+
+//Wifi connection timeout. If Wifi connection is lost for this long the ESP is restarted
+#define WIFI_CONNECT_TIMEOUT 30*1000 
