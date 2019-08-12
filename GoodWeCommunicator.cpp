@@ -120,7 +120,13 @@ void GoodWeCommunicator::checkOfflineInverters()
 				sendRemoveRegistration(inverters[index].address); //send in case the inverter thinks we are online
 			}
 			inverters[index].isOnline = newOnline;				
-		}		
+		}
+		else
+		{
+			//offline inverter. Reset eday at midnight
+			if (inverters[index].eDay > 0 && timeClient.getMinutes == 0 && timeClient.getHours == 0)
+				inverters[index].eDay = 0;
+		}
 	}		
 }
 
