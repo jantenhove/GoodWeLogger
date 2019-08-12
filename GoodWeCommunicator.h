@@ -3,6 +3,7 @@
 #include <SoftwareSerial.h>
 #include <ESP8266WiFi.h>
 #include "SettingsManager.h"
+#include "TimeLib.h"
 
 #define GOODWE_COMMS_ADDRES 0xAB
 #define PACKET_TIMEOUT 5000			//5 sec packet timeout

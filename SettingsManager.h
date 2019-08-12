@@ -24,11 +24,17 @@ public:
 		String wifiHostname;		//Set hostname for ESP8266
 		String wifiSSID;
 		String wifiPassword;
+		int wifiConnectTimeout;
 
 		//general settings
 		int RS485Rx =D1;		//default set because added later
 		int RS485Tx =D2;
+		int inverterOfflineDataResetTimeout;
 		int timezone;
+
+		//NTP
+		String ntpServer;
+
 
 	};
 	SettingsManager();

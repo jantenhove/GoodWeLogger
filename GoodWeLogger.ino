@@ -41,7 +41,9 @@ void setup()
 	settings->timezone = TIMEZONE;
 	settings->RS485Rx = RS485_RX;
 	settings->RS485Tx = RS485_TX;
-
+	settings->wifiConnectTimeout = WIFI_CONNECT_TIMEOUT;
+	settings->ntpServer = NTP_SERVER;
+	settings->inverterOfflineDataResetTimeout = INVERTER_OFFLINE_RESET_VALUES_TIMEOUT;
 
 	//Init our compononents
 	Serial.begin(115200);
@@ -49,7 +51,7 @@ void setup()
 	WiFi.mode(WIFI_STA);
 	WiFi.hostname(settings->wifiHostname.c_str());
 	WiFi.begin(settings->wifiSSID.c_str(), settings->wifiPassword.c_str());
-	
+
 	//check wifi connection
 	if (!checkConnectToWifi())
 	{
@@ -135,7 +137,7 @@ void loop()
 		Serial.println("Wifi connection lost for too long. Restarting ESP");
 		ESP.restart();
 	}
-		
+
 
 	ArduinoOTA.handle();
 	yield();

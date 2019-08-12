@@ -113,48 +113,45 @@ void MQTTPublisher::handle()
 				Serial.println(prependTopic);
 			}
 
-			if (inverters[cnt].isOnline && inverters[cnt].addressConfirmed)
+			//send values when offline or online since the values can be reset when offline
+			if (sendQuick)
 			{
-				if (sendQuick)
+				//send out fast changing values
+				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/online", inverters[cnt].isOnline && inverters[cnt].addressConfirmed ? "1" : "0");
+				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vpv1", String(inverters[cnt].vpv1, 1));
+				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vpv2", String(inverters[cnt].vpv2, 1));
+				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/ipv1", String(inverters[cnt].ipv1, 1));
+				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/ipv2", String(inverters[cnt].ipv2, 1));
+				//publishing sometimes cuases the wdt to reset the ESP. 
+				//On the github page of the pubsubclient it was suggested to add extra client.loop().
+				client.loop();
+				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vac1", String(inverters[cnt].vac1, 1));
+				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/iac1", String(inverters[cnt].iac1, 1));
+				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/fac1", String(inverters[cnt].fac1, 2));
+				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/pac", String(inverters[cnt].pac));
+				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/temp", String(inverters[cnt].temp, 1));
+
+				if (inverters[cnt].isDTSeries)
 				{
-					//send out fast changing values
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/online", "1");
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vpv1", String(inverters[cnt].vpv1, 1));
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vpv2", String(inverters[cnt].vpv2, 1));
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/ipv1", String(inverters[cnt].ipv1, 1));
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/ipv2", String(inverters[cnt].ipv2, 1));
-					//publishing sometimes cuases the wdt to reset the ESP. 
 					//On the github page of the pubsubclient it was suggested to add extra client.loop().
 					client.loop();
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vac1", String(inverters[cnt].vac1, 1));
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/iac1", String(inverters[cnt].iac1, 1));
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/fac1", String(inverters[cnt].fac1, 2));
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/pac", String(inverters[cnt].pac));
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/temp", String(inverters[cnt].temp, 1));
-
-					if (inverters[cnt].isDTSeries)
-					{
-						//On the github page of the pubsubclient it was suggested to add extra client.loop().
-						client.loop();
-						//also send tri fase info
-						if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vac2", String(inverters[cnt].vac2, 1));
-						if (sendOk) sendOk = publishOnMQTT(prependTopic, "/iac2", String(inverters[cnt].iac2, 1));
-						if (sendOk) sendOk = publishOnMQTT(prependTopic, "/fac2", String(inverters[cnt].fac2, 2));
-						if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vac3", String(inverters[cnt].vac3, 1));
-						if (sendOk) sendOk = publishOnMQTT(prependTopic, "/iac3", String(inverters[cnt].iac3, 1));
-						if (sendOk) sendOk = publishOnMQTT(prependTopic, "/fac3", String(inverters[cnt].fac3, 2));
-					}
-				}
-				else
-				{
-					//regular
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/workmode", String(inverters[cnt].workMode));
-					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/eday", String(inverters[cnt].eDay));
-					//TODO: Rest of data 
+					//also send tri fase info
+					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vac2", String(inverters[cnt].vac2, 1));
+					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/iac2", String(inverters[cnt].iac2, 1));
+					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/fac2", String(inverters[cnt].fac2, 2));
+					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vac3", String(inverters[cnt].vac3, 1));
+					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/iac3", String(inverters[cnt].iac3, 1));
+					if (sendOk) sendOk = publishOnMQTT(prependTopic, "/fac3", String(inverters[cnt].fac3, 2));
 				}
 			}
-			else if (sendRegular) //only send offline info on regular basis
-				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/online", "0");
+			else
+			{
+				//regular
+				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/workmode", String(inverters[cnt].workMode));
+				if (sendOk) sendOk = publishOnMQTT(prependTopic, "/eday", String(inverters[cnt].eDay));
+				//TODO: Rest of data 
+			}
+
 
 
 			//On the github page of the pubsubclient it was suggested to add extra client.loop().

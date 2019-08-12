@@ -48,3 +48,6 @@
 
 //Wifi connection timeout. If Wifi connection is lost for this long the ESP is restarted
 #define WIFI_CONNECT_TIMEOUT 30*1000 
+
+//Inverter data reset after 11 minutes (inverter reconnect timeout is 10 minutes, 1 minute extra to avoid too quick reset) 
+#define INVERTER_OFFLINE_RESET_VALUES_TIMEOUT 11*60*1000 

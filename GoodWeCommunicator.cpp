@@ -124,8 +124,19 @@ void GoodWeCommunicator::checkOfflineInverters()
 		else
 		{
 			//offline inverter. Reset eday at midnight
-			if (inverters[index].eDay > 0 && timeClient.getMinutes == 0 && timeClient.getHours == 0)
+			if (inverters[index].eDay > 0 && hour() == 0 && minute() == 0)
 				inverters[index].eDay = 0;
+
+			//check for data reset
+			if (inverters[index].pac  > 0 && millis() - inverters[index].lastSeen - OFFLINE_TIMEOUT > settingsManager->GetSettings()->inverterOfflineDataResetTimeout)
+			{
+				//reset all but eTotal and hTotal and eDay
+				inverters[index].fac1 = inverters[index].fac2 = inverters[index].fac3 = inverters[index].gcfiFault =
+					inverters[index].iac1 = inverters[index].iac2 = inverters[index].iac3 = inverters[index].ipv1 = inverters[index].ipv2 =
+					inverters[index].line1FFault = inverters[index].line1VFault = inverters[index].line2FFault = inverters[index].line2VFault = inverters[index].line3FFault =
+					inverters[index].line3VFault = inverters[index].pac = inverters[index].pv1Fault = inverters[index].pv2Fault = inverters[index].vac1 = inverters[index].vac2 =
+					inverters[index].vac3 = inverters[index].vpv1 = inverters[index].vpv2 = 0;
+			}
 		}
 	}		
 }
