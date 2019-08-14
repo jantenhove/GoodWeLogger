@@ -103,39 +103,40 @@ void GoodWeCommunicator::checkOfflineInverters()
 	//check inverter timeout
 	for (char index = 0; index < inverters.size(); ++index)
 	{
-		if (inverters[index].isOnline)
+		auto inverter = inverters[index];
+		if (inverter.isOnline)
 		{
-			auto newOnline = (millis() - inverters[index].lastSeen < OFFLINE_TIMEOUT);
+			auto newOnline = (millis() - inverter.lastSeen < OFFLINE_TIMEOUT);
 			
 			//check if inverter timed out
-			if (!newOnline && inverters[index].isOnline)
+			if (!newOnline && inverter.isOnline)
 			{
 				if (debugMode)
 				{
 					Serial.print("Marking inverter @ address: ");
-					Serial.print((short)inverters[index].address);
+					Serial.print((short)inverter.address);
 					Serial.println("offline.");
 				}
 
-				sendRemoveRegistration(inverters[index].address); //send in case the inverter thinks we are online
+				sendRemoveRegistration(inverter.address); //send in case the inverter thinks we are online
 			}
-			inverters[index].isOnline = newOnline;				
+			inverter.isOnline = newOnline;				
 		}
 		else
 		{
 			//offline inverter. Reset eday at midnight
-			if (inverters[index].eDay > 0 && hour() == 0 && minute() == 0)
-				inverters[index].eDay = 0;
+			if (inverter.eDay > 0 && hour() == 0 && minute() == 0)
+				inverter.eDay = 0;
 
 			//check for data reset
-			if (inverters[index].pac  > 0 && millis() - inverters[index].lastSeen - OFFLINE_TIMEOUT > settingsManager->GetSettings()->inverterOfflineDataResetTimeout)
+			if (inverter.vac1  > 0 && millis() - inverter.lastSeen - OFFLINE_TIMEOUT > settingsManager->GetSettings()->inverterOfflineDataResetTimeout)
 			{
-				//reset all but eTotal and hTotal and eDay
-				inverters[index].fac1 = inverters[index].fac2 = inverters[index].fac3 = inverters[index].gcfiFault =
-					inverters[index].iac1 = inverters[index].iac2 = inverters[index].iac3 = inverters[index].ipv1 = inverters[index].ipv2 =
-					inverters[index].line1FFault = inverters[index].line1VFault = inverters[index].line2FFault = inverters[index].line2VFault = inverters[index].line3FFault =
-					inverters[index].line3VFault = inverters[index].pac = inverters[index].pv1Fault = inverters[index].pv2Fault = inverters[index].vac1 = inverters[index].vac2 =
-					inverters[index].vac3 = inverters[index].vpv1 = inverters[index].vpv2 = 0;
+				//reset all but eTotal, hTotal and eDay
+				inverter.fac1 = inverter.fac2 = inverter.fac3 = inverter.gcfiFault =
+					inverter.iac1 = inverter.iac2 = inverter.iac3 = inverter.ipv1 = inverter.ipv2 =
+					inverter.line1FFault = inverter.line1VFault = inverter.line2FFault = inverter.line2VFault = inverter.line3FFault =
+					inverter.line3VFault = inverter.pac = inverter.pv1Fault = inverter.pv2Fault = inverter.vac1 = inverter.vac2 =
+					inverter.vac3 = inverter.vpv1 = inverter.vpv2 = inverter.temp = 0;
 			}
 		}
 	}		
