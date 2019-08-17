@@ -14,7 +14,7 @@ void GoodWeCommunicator::start()
 	goodweSerial = new SoftwareSerial(settings->RS485Rx, settings->RS485Tx, false, BufferSize); // (RX, TX. inverted, buffer)
 	//start the software serial
 	goodweSerial->begin(9600); //inverter fixed baud rate
-
+	inverters.clear();
 	//set the fixed part of our buffer
 	headerBuffer[0] = 0xAA;
 	headerBuffer[1] = 0x55;
@@ -104,12 +104,11 @@ void GoodWeCommunicator::checkOfflineInverters()
 	for (char index = 0; index < inverters.size(); ++index)
 	{
 		auto inverter = inverters[index];
+		auto newOnline = (millis() - inverter.lastSeen < OFFLINE_TIMEOUT);
 		if (inverter.isOnline)
 		{
-			auto newOnline = (millis() - inverter.lastSeen < OFFLINE_TIMEOUT);
-			
 			//check if inverter timed out
-			if (!newOnline && inverter.isOnline)
+			if (!newOnline)
 			{
 				if (debugMode)
 				{
@@ -119,10 +118,10 @@ void GoodWeCommunicator::checkOfflineInverters()
 				}
 
 				sendRemoveRegistration(inverter.address); //send in case the inverter thinks we are online
+				inverter.isOnline = inverter.addressConfirmed = false;
 			}
-			inverter.isOnline = newOnline;				
 		}
-		else
+		else if(!newOnline) //still offline
 		{
 			//offline inverter. Reset eday at midnight
 			if (inverter.eDay > 0 && hour() == 0 && minute() == 0)
@@ -139,6 +138,8 @@ void GoodWeCommunicator::checkOfflineInverters()
 					inverter.vac3 = inverter.vpv1 = inverter.vpv2 = inverter.temp = 0;
 			}
 		}
+
+		inverter.isOnline = newOnline;
 	}		
 }
 
