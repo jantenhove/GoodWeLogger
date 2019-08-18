@@ -1,7 +1,7 @@
 #include "GoodWeCommunicator.h"
 
 
-GoodWeCommunicator::GoodWeCommunicator(SettingsManager * settingsMan, bool inDebug)
+GoodWeCommunicator::GoodWeCommunicator(SettingsManager* settingsMan, bool inDebug)
 {
 	settingsManager = settingsMan;
 	debugMode = inDebug;
@@ -38,7 +38,7 @@ void GoodWeCommunicator::stop()
 }
 
 
-int GoodWeCommunicator::sendData(char address, char controlCode, char functionCode, char dataLength, char * data)
+int GoodWeCommunicator::sendData(char address, char controlCode, char functionCode, char dataLength, char* data)
 {
 	if (debugMode)
 		Serial.write("Sending data to inverter(s): ");
@@ -93,7 +93,7 @@ void GoodWeCommunicator::debugPrintHex(char bt)
 void GoodWeCommunicator::sendDiscovery()
 {
 	//send out discovery for unregistered devices.
-	if(debugMode)
+	if (debugMode)
 		Serial.println("Sending discovery");
 	sendData(0x7F, 0x00, 0x00, 0x00, nullptr);
 }
@@ -103,44 +103,40 @@ void GoodWeCommunicator::checkOfflineInverters()
 	//check inverter timeout
 	for (char index = 0; index < inverters.size(); ++index)
 	{
-		auto inverter = inverters[index];
-		auto newOnline = (millis() - inverter.lastSeen < OFFLINE_TIMEOUT);
-		if (inverter.isOnline)
+		auto newOnline = (millis() - inverters[index].lastSeen) < OFFLINE_TIMEOUT;
+		if (inverters[index].isOnline && !newOnline)
 		{
 			//check if inverter timed out
-			if (!newOnline)
+			if (debugMode)
 			{
-				if (debugMode)
-				{
-					Serial.print("Marking inverter @ address: ");
-					Serial.print((short)inverter.address);
-					Serial.println("offline.");
-				}
-
-				sendRemoveRegistration(inverter.address); //send in case the inverter thinks we are online
-				inverter.isOnline = inverter.addressConfirmed = false;
+				Serial.print("Marking inverter @ address: ");
+				Serial.print((short)inverters[index].address);
+				Serial.println("offline.");
 			}
+
+			sendRemoveRegistration(inverters[index].address); //send in case the inverter thinks we are online
+			inverters[index].isOnline = inverters[index].addressConfirmed = false;
 		}
-		else if(!newOnline) //still offline
+		else if (!inverters[index].isOnline && !newOnline) //still offline
 		{
 			//offline inverter. Reset eday at midnight
-			if (inverter.eDay > 0 && hour() == 0 && minute() == 0)
-				inverter.eDay = 0;
+			if (inverters[index].eDay > 0 && hour() == 0 && minute() == 0)
+				inverters[index].eDay = 0;
 
 			//check for data reset
-			if (inverter.vac1  > 0 && millis() - inverter.lastSeen - OFFLINE_TIMEOUT > settingsManager->GetSettings()->inverterOfflineDataResetTimeout)
+			if (inverters[index].vac1 > 0 && millis() - inverters[index].lastSeen - OFFLINE_TIMEOUT > settingsManager->GetSettings()->inverterOfflineDataResetTimeout)
 			{
 				//reset all but eTotal, hTotal and eDay
-				inverter.fac1 = inverter.fac2 = inverter.fac3 = inverter.gcfiFault =
-					inverter.iac1 = inverter.iac2 = inverter.iac3 = inverter.ipv1 = inverter.ipv2 =
-					inverter.line1FFault = inverter.line1VFault = inverter.line2FFault = inverter.line2VFault = inverter.line3FFault =
-					inverter.line3VFault = inverter.pac = inverter.pv1Fault = inverter.pv2Fault = inverter.vac1 = inverter.vac2 =
-					inverter.vac3 = inverter.vpv1 = inverter.vpv2 = inverter.temp = 0;
+				inverters[index].fac1 = inverters[index].fac2 = inverters[index].fac3 = inverters[index].gcfiFault =
+					inverters[index].iac1 = inverters[index].iac2 = inverters[index].iac3 = inverters[index].ipv1 = inverters[index].ipv2 =
+					inverters[index].line1FFault = inverters[index].line1VFault = inverters[index].line2FFault = inverters[index].line2VFault = inverters[index].line3FFault =
+					inverters[index].line3VFault = inverters[index].pac = inverters[index].pv1Fault = inverters[index].pv2Fault = inverters[index].vac1 = inverters[index].vac2 =
+					inverters[index].vac3 = inverters[index].vpv1 = inverters[index].vpv2 = inverters[index].temp = 0;
 			}
 		}
 
-		inverter.isOnline = newOnline;
-	}		
+		inverters[index].isOnline = newOnline;
+	}
 }
 
 void GoodWeCommunicator::checkIncomingData()
@@ -150,7 +146,7 @@ void GoodWeCommunicator::checkIncomingData()
 		while (goodweSerial->available() > 0)
 		{
 			byte incomingData = goodweSerial->read();
-			
+
 			//wait for packet start. if found read until data length  + data. 
 			//set the time we received the data so we can use some kind of timeout
 			if (!startPacketReceived && (lastReceivedByte == 0xAA && incomingData == 0x55))
@@ -192,7 +188,7 @@ void GoodWeCommunicator::checkIncomingData()
 				lastReceivedByte = incomingData; //keep track of the last incoming byte so we detect the packet start
 		}
 
-		
+
 	}
 	if (startPacketReceived && millis() - lastReceived > PACKET_TIMEOUT) // 0.5 sec timoeut
 	{
@@ -240,7 +236,7 @@ void GoodWeCommunicator::parseIncomingData(char incomingDataLength) //
 		return;
 	if (debugMode)
 		Serial.println("CRC match.");
-	
+
 	//check the contorl code and function code to see what to do
 	if (inputBuffer[2] == 0x00 && inputBuffer[3] == 0x80)
 		handleRegistration(inputBuffer + 5, 16);
@@ -250,7 +246,7 @@ void GoodWeCommunicator::parseIncomingData(char incomingDataLength) //
 		handleIncomingInformation(inputBuffer[0], inputBuffer[4], inputBuffer + 5);
 }
 
-void GoodWeCommunicator::handleRegistration(char * serialNumber, char length)
+void GoodWeCommunicator::handleRegistration(char* serialNumber, char length)
 {
 	//check if the serialnumber isn't listed yet. If it is use that one
 	//Add the serialnumber, generate an address and send it to the inverter
@@ -325,7 +321,7 @@ void GoodWeCommunicator::handleRegistrationConfirmation(char address)
 	askInverterForInformation(address);
 }
 
-void GoodWeCommunicator::handleIncomingInformation(char address, char dataLength, char * data)
+void GoodWeCommunicator::handleIncomingInformation(char address, char dataLength, char* data)
 {
 	//need to parse the information and update our struct
 	//parse all pairs of two bytes and output them
@@ -339,7 +335,7 @@ void GoodWeCommunicator::handleIncomingInformation(char address, char dataLength
 	inverter->lastSeen = millis();
 	char dtPtr = 0;
 	inverter->vpv1 = bytesToFloat(data, 10);					dtPtr += 2;
-	inverter->vpv2 = bytesToFloat(data+ dtPtr, 10);				dtPtr += 2;
+	inverter->vpv2 = bytesToFloat(data + dtPtr, 10);				dtPtr += 2;
 	inverter->ipv1 = bytesToFloat(data + dtPtr, 10);			dtPtr += 2;
 	inverter->ipv2 = bytesToFloat(data + dtPtr, 10);			dtPtr += 2;
 	inverter->vac1 = bytesToFloat(data + dtPtr, 10);			dtPtr += 2;
@@ -360,16 +356,16 @@ void GoodWeCommunicator::handleIncomingInformation(char address, char dataLength
 		inverter->fac2 = bytesToFloat(data + dtPtr, 100);		dtPtr += 2;
 		inverter->fac3 = bytesToFloat(data + dtPtr, 100);		dtPtr += 2;
 	}
-	inverter->pac = ((unsigned short)(data[dtPtr]) << 8) | (data[dtPtr +1]);			dtPtr += 2;
+	inverter->pac = ((unsigned short)(data[dtPtr]) << 8) | (data[dtPtr + 1]);			dtPtr += 2;
 	inverter->workMode = ((unsigned short)(data[dtPtr]) << 8) | (data[dtPtr + 1]);	dtPtr += 2;
 	//TODO: Get the other values too
 	inverter->temp = bytesToFloat(data + dtPtr, 10);		dtPtr += inverter->isDTSeries ? 34 : 26;
-	inverter->eDay = bytesToFloat(data + dtPtr, 10);		
+	inverter->eDay = bytesToFloat(data + dtPtr, 10);
 	//isonline is set after first batch of data is set so readers get actual data 
-	inverter->isOnline = true;
+	//inverter->isOnline = true;
 }
 
-float GoodWeCommunicator::bytesToFloat(char * bt, char factor)
+float GoodWeCommunicator::bytesToFloat(char* bt, char factor)
 {
 	//convert two byte to float by converting to short and then dividing it by factor
 	return float(((unsigned short)bt[0] << 8) | bt[1]) / factor;
@@ -402,7 +398,7 @@ void GoodWeCommunicator::askInverterForInformation(char address)
 	sendData(address, 0x01, 0x01, 0, nullptr);
 }
 
-GoodWeCommunicator::GoodweInverterInformation *  GoodWeCommunicator::getInverterInfoByAddress(char address)
+GoodWeCommunicator::GoodweInverterInformation* GoodWeCommunicator::getInverterInfoByAddress(char address)
 {
 	for (char index = 0; index < inverters.size(); ++index)
 	{
@@ -413,7 +409,7 @@ GoodWeCommunicator::GoodweInverterInformation *  GoodWeCommunicator::getInverter
 	return nullptr;
 }
 
-void GoodWeCommunicator::sendAllocateRegisterAddress(char * serialNumber, char address)
+void GoodWeCommunicator::sendAllocateRegisterAddress(char* serialNumber, char address)
 {
 	if (debugMode)
 	{
