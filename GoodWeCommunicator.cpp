@@ -11,9 +11,9 @@ void GoodWeCommunicator::start()
 {
 	auto settings = settingsManager->GetSettings();
 	//create the software serial on the custom pins so we can use the hardware serial for debug comms.
-	goodweSerial = new SoftwareSerial(settings->RS485Rx, settings->RS485Tx, false, BufferSize); // (RX, TX. inverted, buffer)
-	//start the software serial
-	goodweSerial->begin(9600); //inverter fixed baud rate
+	goodweSerial = new SoftwareSerial(); // (RX, TX. inverted, buffer)
+	//start the software serial with the params (buffersize is larger than default, that's why we cant ue the constructor)	
+	goodweSerial->begin(9600, SWSERIAL_8N1, settings->RS485Rx, settings->RS485Tx, false, BufferSize); //inverter fixed baud rate
 	inverters.clear();
 	//set the fixed part of our buffer
 	headerBuffer[0] = 0xAA;
