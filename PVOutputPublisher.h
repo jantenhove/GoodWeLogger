@@ -5,13 +5,14 @@
 #include "SettingsManager.h"
 #include "GoodWeCommunicator.h"
 #include "ESP8266HTTPClient.h"
+#include "Debug.h"
 
 #define MAX_EDAY_DIFF 100.0f
 
 class PVOutputPublisher
 {
 public:
-	PVOutputPublisher(SettingsManager * settingsManager, GoodWeCommunicator *goodWe, bool inDebugMode = false);
+	PVOutputPublisher(SettingsManager * settingsManager, GoodWeCommunicator *goodWe);
 	~PVOutputPublisher();
 
 	void start();
@@ -28,7 +29,6 @@ private:
 	SettingsManager::Settings * pvoutputSettings;
 	SettingsManager * pvOutputSettingsManager;
 	GoodWeCommunicator * goodweCommunicator;
-	bool debugMode;
 	unsigned long lastUpdated;
 	bool isStarted = false;	 
 	unsigned long currentPacSum = 0;

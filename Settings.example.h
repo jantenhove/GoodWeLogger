@@ -17,10 +17,10 @@
 #define MQTT_PASSWORD   "<mqtt password>"
 
 //update interval for fast changing values in milliseconds for mqtt
-#define MQTT_QUICK_UPDATE_INTERVAL  1000
+#define MQTT_QUICK_UPDATE_INTERVAL  10000
 
 //update interval for slow changing values in milliseconds for mqtt
-#define MQTT_REGULAR_UPDATE_INTERVAL  10000
+#define MQTT_REGULAR_UPDATE_INTERVAL  60000
 
 //set to your pvoutput api key (must have write rights). Leave empty to disable pvoutput publishing
 #define PVOUTPUT_API_KEY  "<your api key for pvoutput>"
@@ -51,3 +51,9 @@
 
 //Inverter data reset after 11 minutes (inverter reconnect timeout is 10 minutes, 1 minute extra to avoid too quick reset) 
 #define INVERTER_OFFLINE_RESET_VALUES_TIMEOUT 11*60*1000 
+
+//Enable debbugging through serial or remote
+#define DEBUGGING_ENABLED true
+
+//Enable telnet/remote debugging?
+#define REMOTE_DEBUGGING_ENABLED true

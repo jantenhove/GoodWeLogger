@@ -10,16 +10,20 @@
 #include "MQTTPublisher.h"
 #include "PVOutputPublisher.h"
 #include "Settings.h"			//change and then rename Settings.example.h to Settings.h to compile
-
+#include "Debug.h"
 
 SettingsManager settingsManager;
-GoodWeCommunicator goodweComms(&settingsManager, false);
-MQTTPublisher mqqtPublisher(&settingsManager, &goodweComms, false);
-PVOutputPublisher pvoutputPublisher(&settingsManager, &goodweComms, false);
+GoodWeCommunicator goodweComms(&settingsManager);
+MQTTPublisher mqqtPublisher(&settingsManager, &goodweComms);
+PVOutputPublisher pvoutputPublisher(&settingsManager, &goodweComms);
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, NTP_SERVER);
 bool validTimeSet = false;
 int reconnectCounter = 0;
+
+#ifdef REMOTE_DEBUGGING_ENABLED
+RemoteDebug Debug;
+#endif
 
 void setup()
 {
@@ -86,12 +90,28 @@ void setup()
 	Serial.println("IP address: ");
 	Serial.println(WiFi.localIP());
 
+#ifdef REMOTE_DEBUGGING_ENABLED
+	Debug.begin("GoodweLogger");
+	Debug.setResetCmdEnabled(true);
+	Debug.setCallBackNewClient(&RemoteDebugClientConnected);
+#endif
+
 	//ntp client
 	goodweComms.start();
 	mqqtPublisher.start();
 	validTimeSet = timeClient.update();
 	timeClient.setTimeOffset(settings->timezone * 60 * 60);
 }
+
+
+#ifdef REMOTE_DEBUGGING_ENABLED
+void RemoteDebugClientConnected()
+{
+	//Debug client connected. Print all our info
+	debugPrintln("===GoodWeLogger remote debug enabled===");
+	
+}
+#endif
 
 bool checkConnectToWifi()
 {
@@ -138,7 +158,6 @@ void loop()
 		ESP.restart();
 	}
 
-
 	ArduinoOTA.handle();
 	yield();
 	goodweComms.handle();
@@ -151,4 +170,8 @@ void loop()
 
 	pvoutputPublisher.handle();
 	yield(); //prevent wathcdog timeout
+
+#ifdef REMOTE_DEBUGGING_ENABLED
+	Debug.handle();
+#endif
 }

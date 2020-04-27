@@ -1,15 +1,17 @@
 #pragma once
 #include <vector>
-#include <SoftwareSerial.h>
+#include "SoftwareSerial52.h"
 #include <ESP8266WiFi.h>
 #include "SettingsManager.h"
 #include "TimeLib.h"
+#include "Debug.h"
 
 #define GOODWE_COMMS_ADDRES 0xAB
 #define PACKET_TIMEOUT 5000			//5 sec packet timeout
 #define OFFLINE_TIMEOUT 30000		//30 seconds no data -> inverter offline
-#define DISCOVERY_INTERVAL 10000	//10 secs between discovery 
-#define INFO_INTERVAL 1000			//get inverter info every second
+#define DISCOVERY_NO_INVERTERS_INTERVAL 10000	//10 secs between discovery if not found
+#define DISCOVERY_WITH_ACTIVE_INVERTERS_INTERVAL 300000	//5 minutes if found
+#define INFO_INTERVAL 10000			//get inverter info every ten seconds
 
 class GoodWeCommunicator
 {
@@ -56,7 +58,7 @@ public:
 		float eDay = 0.0;
 	};
 
-	GoodWeCommunicator(SettingsManager * settingsManager, bool debugMode = false);
+	GoodWeCommunicator(SettingsManager * settingsManager);
 	void start();
 	void stop();
 	void handle();
@@ -67,16 +69,13 @@ public:
 private:
 
 
-	static const int BufferSize = 96;	// largest packet is 67 bytes long. Extra for receiving with sliding window 
-	SoftwareSerial * goodweSerial;
+	static const int BufferSize = 256;	// largest packet is 67 bytes long. Extra for receiving with sliding window 
+	SoftwareSerial52* goodweSerial;
 	SettingsManager * settingsManager;
 
 	char headerBuffer[7];
 	char inputBuffer[BufferSize];
 	char outputBuffer[BufferSize];
-
-	bool debugMode;
-
 	unsigned long lastReceived = 0;			//timeout detection
 	bool startPacketReceived = false;		//start packet marker
 	char lastReceivedByte = 0;				//packet start consist of 2 bytes to test. This holds the previous byte

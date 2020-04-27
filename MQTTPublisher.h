@@ -7,6 +7,7 @@
 #include <vector>
 #include "PubSubClient.h"
 #include "WiFiClient.h"
+#include "Debug.h"
 
 #define RECONNECT_TIMEOUT 15000
 
@@ -17,7 +18,6 @@ private:
 	SettingsManager::Settings * mqttSettings;
 	SettingsManager * mqttSettingsManager;
 	GoodWeCommunicator * goodweCommunicator;
-	bool debugMode;
 	bool isStarted;
 
 	unsigned long lastConnectionAttempt = 0;		//last reconnect
@@ -27,7 +27,7 @@ private:
 	bool publishOnMQTT(String prepend, String topic, String value);
 	bool reconnect();
 public:
-	MQTTPublisher(SettingsManager * settingsManager, GoodWeCommunicator *goodWe, bool inDebugMode = false);
+	MQTTPublisher(SettingsManager * settingsManager, GoodWeCommunicator *goodWe);
 	~MQTTPublisher();
 
 	void start();

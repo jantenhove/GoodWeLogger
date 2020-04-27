@@ -3,12 +3,11 @@
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-MQTTPublisher::MQTTPublisher(SettingsManager* settingsManager, GoodWeCommunicator* goodWe, bool inDebugMode)
+MQTTPublisher::MQTTPublisher(SettingsManager* settingsManager, GoodWeCommunicator* goodWe)
 {
 	randomSeed(micros());
 	mqttSettingsManager = settingsManager;
 	goodweCommunicator = goodWe;
-	debugMode = inDebugMode;
 }
 
 MQTTPublisher::~MQTTPublisher()
@@ -21,12 +20,11 @@ MQTTPublisher::~MQTTPublisher()
 bool MQTTPublisher::reconnect()
 {
 	lastConnectionAttempt = millis();
-	if (debugMode)
-	{
-		Serial.print("Attempting MQTT connection to server: ");
-		Serial.print(mqttSettings->mqttHostName);
-		Serial.println("...");
-	}
+
+	debugPrint("Attempting MQTT connection to server: ");
+	debugPrint(mqttSettings->mqttHostName);
+	debugPrintln("...");
+
 
 	// Create a random client ID
 	String clientId = "GoodWeLogger-";
@@ -36,30 +34,29 @@ bool MQTTPublisher::reconnect()
 	bool clientConnected;
 	if (mqttSettings->mqttUserName.length())
 	{
-		Serial.println("Using user credientials for authentication.");
+		debugPrintln("Using user credientials for authentication.");
 		clientConnected = client.connect(clientId.c_str(), mqttSettings->mqttUserName.c_str(), mqttSettings->mqttPassword.c_str());
 	}
 	else
 	{
-		Serial.println("Connecting without user credentials.");
+		debugPrintln("Connecting without user credentials.");
 		clientConnected = client.connect(clientId.c_str());
 	}
 
 	if (clientConnected)
 	{
-		if (debugMode)
-			Serial.println("connected");
+		debugPrintln("connected");
 		// Once connected, publish an announcement...
 		client.publish("goodwe", "online");
 
 		return true;
 	}
 	else {
-		if (debugMode)
-		{
-			Serial.print("failed, rc=");
-			Serial.print(client.state());
-		}
+
+
+		debugPrint("failed, rc=");
+		debugPrint(client.state());
+
 	}
 
 	return false;
@@ -71,10 +68,10 @@ void MQTTPublisher::start()
 	mqttSettings = mqttSettingsManager->GetSettings();
 	if (mqttSettings->mqttHostName.length() == 0 || mqttSettings->mqttPort == 0)
 	{
-		Serial.println("MQTT disabled. No hostname or port set.");
+		debugPrintln("MQTT disabled. No hostname or port set.");
 		return; //not configured
 	}
-	Serial.println("MQTT enabled. Connecting.");
+	debugPrintln("MQTT enabled. Connecting.");
 	client.setServer(mqttSettings->mqttHostName.c_str(), mqttSettings->mqttPort);
 	reconnect(); //connect right away
 	isStarted = true;
@@ -107,11 +104,10 @@ void MQTTPublisher::handle()
 		for (char cnt = 0; cnt < inverters.size(); cnt++)
 		{
 			auto prependTopic = (String("goodwe/") + String(inverters[cnt].serialNumber));
-			if (debugMode)
-			{
-				Serial.print("Publishing prepend topic for this inverter is: ");
-				Serial.println(prependTopic);
-			}
+
+			debugPrint("Publishing prepend topic for this inverter is: ");
+			debugPrintln(prependTopic);
+
 
 			//send values when offline or online since the values can be reset when offline
 			if (sendQuick)
@@ -163,11 +159,10 @@ void MQTTPublisher::handle()
 		if (sendRegular)
 			lastSentRegularUpdate = millis();
 
-		if (debugMode)
-		{
-			Serial.print("MQTT send status: ");
-			Serial.println(sendOk);
-		}
+
+		debugPrint("MQTT send status: ");
+		debugPrintln(sendOk);
+
 	}
 }
 
