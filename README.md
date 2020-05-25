@@ -15,6 +15,7 @@ Sending information to a MQTT broker is supported, as well as uploading informat
    - ['Time' library](https://github.com/PaulStoffregen/Time)
    - [NTPClient](https://github.com/arduino-libraries/NTPClient)
    - [PubSubClient](https://github.com/knolleary/pubsubclient)
+   - [RemoteDebug (forked)](https://github.com/jantenhove/RemoteDebug)
  - Clone/download this repository
  - Rename the `Settings.example.h` to `Settings.h` and configure it to match your preferred settings
  - Compile and upload the firmware to your ESP8266 using the Arduino IDE  
