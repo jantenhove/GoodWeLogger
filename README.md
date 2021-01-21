@@ -28,6 +28,8 @@ It is a 6 pin green terminal (male), the female counterpart is probably part num
 
 ***Above information applies to the GWxxxxD-NS range of inverters. Other models might use a different method of connecting. Consult your inverter manual.***
 
+For GWxxxx-DT inverters the female couterpart is a 6 pin green terminal with 3.5pitch. possible partnumber is: AK1550/06-3.5 
+
 The green 6 pin connector inside the inverter looks like this:
 
        +------------+    +---+---+---+---+---+---+
