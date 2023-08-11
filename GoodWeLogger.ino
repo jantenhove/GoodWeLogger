@@ -103,9 +103,9 @@ void setup()
 	mqqtPublisher.start();
 	validTimeSet = timeClient.update();
 	timeClient.setTimeOffset(settings->timezone * 60 * 60);
-    // Initialize the watchdog timer
-    esp_task_wdt_init(WDT_TIMEOUT, true); // Enable panic so ESP32 restarts
-    esp_task_wdt_add(NULL); // Add the current task to the watchdog
+	// Initialize the watchdog timer
+	esp_task_wdt_init(WDT_TIMEOUT, true); // Enable panic so ESP32 restarts
+	esp_task_wdt_add(NULL); // Add the current task to the watchdog
 }
 
 
@@ -177,7 +177,7 @@ void loop()
 	yield(); //prevent wathcdog timeout
 	
 	// Feed the watchdog
-    esp_task_wdt_reset();
+	esp_task_wdt_reset();
 
 #ifdef REMOTE_DEBUGGING_ENABLED
 	Debug.handle();
