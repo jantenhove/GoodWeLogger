@@ -20,6 +20,8 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, NTP_SERVER);
 bool validTimeSet = false;
 int reconnectCounter = 0;
+#define WDT_TIMEOUT 600  // 600 seconds = 10 minutes
+
 
 #ifdef REMOTE_DEBUGGING_ENABLED
 RemoteDebug Debug;
@@ -101,6 +103,9 @@ void setup()
 	mqqtPublisher.start();
 	validTimeSet = timeClient.update();
 	timeClient.setTimeOffset(settings->timezone * 60 * 60);
+	// Initialize the watchdog timer
+	esp_task_wdt_init(WDT_TIMEOUT, true); // Enable panic so ESP32 restarts
+	esp_task_wdt_add(NULL); // Add the current task to the watchdog
 }
 
 
@@ -170,6 +175,9 @@ void loop()
 
 	pvoutputPublisher.handle();
 	yield(); //prevent wathcdog timeout
+	
+	// Feed the watchdog
+	esp_task_wdt_reset();
 
 #ifdef REMOTE_DEBUGGING_ENABLED
 	Debug.handle();
